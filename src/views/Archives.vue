@@ -79,7 +79,7 @@ export default {
         archives.loading = false;
         const { nodes, pageInfo } = res.repository.issues;
         if (!pageInfo.hasNextPage) {
-          archives.loading = true;
+          archives.none = true;
         }
         archives.cursor = pageInfo.endCursor;
 
@@ -120,7 +120,7 @@ export default {
           &:before { margin-top: -8px;}
           a, i {
             font-size: 20px;
-            color: #222222;
+            color: $mainStrong;
             line-height: 1.5;
           }
 
@@ -139,15 +139,15 @@ export default {
             position: relative;
             line-height: 44px;
             span {
-              font-size: 12px;
+              font-size: $sizeSmall;
               color: #888888;
               white-space: nowrap;
               margin-right: 4px;
             }
 
             a {
-              font-size: 16px;
-              color: #333333;
+              font-size: $sizeMedium;
+              color: $mainStrong;
               text-overflow: ellipsis;
               white-space: nowrap;
               overflow: hidden;
@@ -178,7 +178,7 @@ export default {
 
     .auxi {
       color: #cccccc;
-      font-size: 12px;
+      font-size: $sizeSmall;
       line-height: 32px;
       margin-top: 8px;
 

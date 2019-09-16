@@ -111,23 +111,25 @@ export default {
     margin: 0 auto;
     padding: 40px 0 80px;
     min-height: calc(100vh + 1px);
-    &:before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 80px;
-      width: 4px;
-      bottom: 80px;
-      background-color: #f9f9f9;
-      z-index: -1;
-      pointer-events: none;
-    }
 
+    .main-wrap { position: relative;
+      &:before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 80px;
+        width: 4px;
+        bottom: 16px;
+        background-color: #f9f9f9;
+        z-index: -1;
+        pointer-events: none;
+      }
+    }
     .page {
         .list .item {
           padding-left: 20px;
 
-          &-name {
+          &-name { position: relative;
             &:before {
               content: '';
               position: absolute;
@@ -217,10 +219,10 @@ export default {
       text-align: center;
       min-height: 50px;
       p {
-        font-size: 13px;
-        line-height: 17px;
+        font-size: $sizeNormal;
+        line-height: 18px;
         color: #d0d0d0;
-        height: 17px;
+        height: 18px;
       }
 
       i {
@@ -237,7 +239,7 @@ export default {
         margin-left: -18px;
 
         span {
-          font-size: 13px;
+          font-size: $sizeNormal;
         }
 
         i {
@@ -316,14 +318,14 @@ export default {
         font-weight: bold;
         font-size: 24px;
         line-height: 1.5;
-        transition: all 0.2s;
+        transition: all $animateTime;
       }
 
       p {
-        font-size: 16px;
+        font-size: $sizeMedium;
         line-height: 19px;
         color: #999999;
-        transition: all 0.2s;
+        transition: all $animateTime;
       }
     }
   }

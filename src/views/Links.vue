@@ -1,16 +1,18 @@
 <template>
   <div class="page-links">
-    <div class="links">
-      <a class="link flex flex-middle" :href="link.url" target="_blank" rel="noopener noreferrer" v-for="(link, index) in links" :key="index">
-        <div class="avatar">
-          <img :src="link.avatar" alt="" v-if="link.avatar">
-        </div>
-        <div class="flex-item">
-          <h4 class="name" v-text="link.name"></h4>
-          <p class="bio" v-text="link.bio"></p>
-        </div>
-      </a>
-    </div>
+    <ul class="links">
+      <li>
+        <a class="link flex flex-middle" :href="link.url" target="_blank" rel="noopener noreferrer" v-for="(link, index) in links" :key="index">
+          <div class="avatar">
+            <img :src="link.avatar" alt="" v-if="link.avatar">
+          </div>
+          <div class="flex-item">
+            <h4 class="name" v-text="link.name"></h4>
+            <p class="bio" v-text="link.bio"></p>
+          </div>
+        </a>
+      </li>
+    </ul>
     <div class="tips flex flex-middle">
       <span class="flex flex-middle flex-center">
         <i class="iconfont icon-mail"></i>
@@ -34,22 +36,33 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+  .pc-mode {
+    .page-links {
+      .links { margin-left: -20px;}
+      .tips { margin-left: -10px;}
+    }
+  }
+  .mobile-mode {
+    .page-links .links {
+      &:before { content: ''; position: absolute; left: 0; right: 0; top: -12px; height: 1px; background-image: linear-gradient(0deg, transparent, #d5d5d5, transparent); background-image: -webkit-linear-gradient(0deg, transparent, #d5d5d5, transparent);}
+    }
+  }
   .page-links {
-    .links { margin-bottom: 24px;
-      .link { margin-left: -20px;
+    .links { position: relative; margin-bottom: 24px;
+      .link {
         .avatar { width: 44px; height: 44px; border-radius: 50%; background-color: #f0f0f0; margin-right: 8px;
           img { width: 100%; height: 100%; border-radius: 50%; overflow: hidden;}
         }
-        .name { font-weight: bold; font-size: 16px; color: #444444; line-height: 24px;}
-        .bio { font-size: 13px; color: #999999; text-overflow: ellipsis; overflow: hidden; line-height: 20px;}
+        .name { font-weight: bold; font-size: $sizeMedium; color: $mainStrong; line-height: 24px;}
+        .bio { font-size: $sizeNormal; color: #999999; text-overflow: ellipsis; overflow: hidden; line-height: 20px;}
       }
       .link + .link { margin-top: 16px;}
     }
-    .tips { height: 32px; color: #dddddd; margin-top: 8px;
-      span { width: 24px; height: 24px; border-radius: 50%; background-color: #f0f0f0; margin-right: 8px; margin-left: -10px;
-        i { font-size: 16px; color: #ffffff;}
+    .tips { min-height: 32px; color: #dddddd; margin-top: 8px;
+      span { width: 24px; height: 24px; border-radius: 50%; background-color: #f0f0f0; margin-right: 8px;
+        i { font-size: $sizeMedium; color: #ffffff;}
       }
-      p { font-size: 16px; color: #dddddd;}
+      p { font-size: $sizeMedium; color: #dddddd; line-height: 24px;}
     }
 
     .btn-next {

@@ -49,7 +49,7 @@
 import {
   reactive,
 } from '@vue/composition-api';
-import { formatTime, getZodiac } from '../utils/utils';
+import { formatTime } from '../utils/utils';
 
 export default {
   setup(props, context) {
@@ -141,7 +141,6 @@ export default {
 
     return {
       formatTime,
-      getZodiac,
       getData,
       changeLabel,
 
@@ -151,12 +150,15 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+  .pc-mode {
+    .page-labels .nav .name { margin-left: -18px;}
+  }
   .page-labels {
     .nav { margin-bottom: 24px;
-      .name { width: 40px; height: 40px; background-color: #f0f0f0; border-radius: 50%; color: #555555; margin-left: -18px; margin-right: 8px;}
+      .name { font-size: $sizeNormal; width: 40px; height: 40px; background-color: #f0f0f0; border-radius: 50%; color: #555555; margin-right: 8px;}
       .labels { flex-wrap: wrap;
-        .label { font-size: 12px; color: #999999; padding: 0 12px; height: 32px; margin-right: 8px; margin-bottom: 8px; border-radius: 15px; background-color: #f6f6f6; transition: all 0.2s;
-          &.active, &:hover { color: #333333; background-color: #f0f0f0;}
+        .label { font-size: $sizeSmall; color: #999999; padding: 0 12px; height: 32px; margin-right: 8px; margin-bottom: 8px; border-radius: 15px; background-color: #f6f6f6; transition: all $animateTime;
+          &.active, &:hover { color: $mainStrong; background-color: #f0f0f0;}
         }
       }
     }
@@ -166,8 +168,8 @@ export default {
           position: relative;
           height: 32px;
           p, strong {
-            font-size: 16px;
-            color: #222222;
+            font-size: $sizeLarge;
+            color: $mainStrong;
           }
           strong { margin-top: 8px;}
         }
@@ -176,17 +178,16 @@ export default {
           .archive {
             position: relative;
             line-height: 44px;
-            &:before { content: ''; position: absolute; left: -22px; top: 50%; margin-top: -4px; width: 8px; height: 8px; border-radius: 50%; background-color: #dddddd;}
             span {
-              font-size: 12px;
+              font-size: $sizeSmall;
               color: #888888;
               white-space: nowrap;
               margin-right: 4px;
             }
 
             a {
-              font-size: 16px;
-              color: #333333;
+              font-size: $sizeMedium;
+              color: $mainStrong;
               text-overflow: ellipsis;
               white-space: nowrap;
               overflow: hidden;
@@ -217,7 +218,7 @@ export default {
 
     .auxi {
       color: #cccccc;
-      font-size: 12px;
+      font-size: $sizeSmall;
       line-height: 32px;
       margin-top: 8px;
 

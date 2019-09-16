@@ -1,8 +1,8 @@
 @font-face {font-family: "iconfont";
-  src: url('./iconfont.eot?t=1568618884900'); /* IE9 */
-  src: url('./iconfont.eot?t=1568618884900#iefix') format('embedded-opentype'), /* IE6-IE8 */
-  url('./iconfont.woff?t=1568618884900') format('woff'),
-  url('./iconfont.ttf?t=1568618884900') format('truetype'); /* chrome, firefox, opera, Safari, Android, iOS 4.2+ */
+  src: url('./iconfont.eot?t=1568620669992'); /* IE9 */
+  src: url('./iconfont.eot?t=1568620669992#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('./iconfont.woff?t=1568620669992') format('woff'),
+  url('./iconfont.ttf?t=1568620669992') format('truetype'); /* chrome, firefox, opera, Safari, Android, iOS 4.2+ */
 }
 
 .iconfont {
@@ -91,6 +91,10 @@
 
 .icon-location:before {
   content: "\e76f";
+}
+
+.icon-search:before {
+  content: "\e741";
 }
 
 .icon-github:before {
