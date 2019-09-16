@@ -1,13 +1,19 @@
 <template>
-  <div class="page-archives">
+  <div class="page-labels">
+    <div class="nav flex flex-middle">
+      <div class="name flex flex-center flex-middle">标签</div>
+      <div class="labels flex-item flex">
+        <a class="label flex flex-middle flex-center" :class="[item.name === archives.label && 'active']" href="javascript:;" v-for="item in archives.labels" :key="item.name" v-text="item.name" @click="changeLabel(item)"></a>
+      </div>
+    </div>
     <div class="list">
-      <div class="item" v-for="year in archives.years" :key="year.year">
-        <div class="item-name flex flex-middle">
-          <a class="font-clg" href="javascript:;" v-text="year.year"></a>
-          <i class="iconfont" :class="[`icon-${getZodiac(year.year)}`]"></i>
+      <div class="item">
+        <div class="item-name flex flex-middle" v-if="archives.label">
+          <p v-text="archives.label"></p>
+          <strong class="font-clg" v-text="`( ${archives.totalCount} )`"></strong>
         </div>
         <ul class="archives">
-          <li class="archive flex flex-middle" v-for="archive in year.archives" :key="archive.number">
+          <li class="archive flex flex-middle" v-for="archive in archives.list" :key="archive.number">
             <span v-text="formatTime(archive.createdAt, 'MM-dd')"></span>
             <router-link :to="`/archives/${archive.number}`" v-text="archive.title" :title="archive.title"></router-link>
             <div class="others flex-item flex-end flex flex-middle">
@@ -45,10 +51,11 @@ import { formatTime, getZodiac } from '../utils/utils';
 
 export default {
   setup(props, context) {
-    const hash = {};
-
     const archives = reactive({
-      years: [],
+      list: [],
+      labels: [],
+      label: null,
+      totalCount: 0,
 
       cursor: null,
       loading: false,
@@ -59,7 +66,7 @@ export default {
       archives.loading = true;
       const query = `query {
           repository(owner: "ChenJiaH", name: "blog") {
-            issues(orderBy: {field: CREATED_AT, direction: DESC}, labels: null, first: 10, after: ${archives.cursor}) {
+            issues(filterBy: {labels: ${archives.label}}, orderBy: {field: CREATED_AT, direction: DESC}, labels: null, first: 10, after: ${archives.cursor}) {
               nodes {
                 title
                 createdAt
@@ -72,38 +79,69 @@ export default {
                 endCursor
                 hasNextPage
               }
+              totalCount
             }
           }
         }`;
       context.root.$http(query).then((res) => {
         archives.loading = false;
-        const { nodes, pageInfo } = res.repository.issues;
+        const { nodes, pageInfo, totalCount } = res.repository.issues;
         if (!pageInfo.hasNextPage) {
-          archives.loading = true;
+          archives.none = true;
         }
         archives.cursor = pageInfo.endCursor;
-
-        nodes.forEach((archive) => {
-          const year = parseFloat(archive.createdAt.substr(0, 4));
-          if (hash[year]) {
-            archives.years[archives.years.length - 1].archives.push(archive);
-          } else {
-            hash[year] = true;
-            archives.years.push({
-              year,
-              archives: [archive],
-            });
+        archives.list = archives.list.concat(nodes);
+        archives.totalCount = totalCount;
+      });
+    };
+    const getLabels = () => {
+      context.root.$loading.show('努力为您查询');
+      const query = `query {
+        repository(owner: "ChenJiaH", name: "blog") {
+          labels(first: 100) {
+            nodes {
+              name
+            }
           }
-        });
+        }
+      }`;
+      context.root.$http(query).then((res) => {
+        archives.loading = false;
+        archives.labels = res.repository.labels.nodes;
+
+        if (archives.labels.length) {
+          archives.label = archives.labels[0].name;
+
+          getData();
+        }
       });
     };
 
-    getData();
+
+    const resetData = () => {
+      archives.cursor = null;
+      archives.loading = false;
+      archives.none = false;
+      archives.list = [];
+      archives.totalCount = 0;
+    };
+
+    const changeLabel = (item) => {
+      if (item.name !== archives.label) {
+        archives.label = item.name;
+        resetData();
+        getData();
+      }
+    };
+
+    getLabels();
+
 
     return {
       formatTime,
       getZodiac,
       getData,
+      changeLabel,
 
       archives,
     };
@@ -111,33 +149,32 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-  .page-archives {
+  .page-labels {
+    .nav {
+      .name { width: 40px; height: 40px; background-color: #f0f0f0; border-radius: 50%; color: #555555; margin-left: -18px; margin-right: 8px;}
+      .labels { flex-wrap: wrap;
+        .label { font-size: 12px; color: #999999; padding: 0 12px; height: 32px; margin-right: 8px; margin-bottom: 8px; border-radius: 15px; background-color: #f6f6f6; transition: all 0.2s;
+          &.active, &:hover { color: #333333; background-color: #f0f0f0;}
+        }
+      }
+    }
     .list {
       .item {
         &-name {
           position: relative;
           height: 32px;
-          &:before { margin-top: -8px;}
-          a, i {
-            font-size: 20px;
+          p, strong {
+            font-size: 16px;
             color: #222222;
-            line-height: 1.5;
           }
-
-          a {
-            font-weight: bold;
-            margin-right: 8px;
-          }
-
-          i {
-            margin-top: -6px;
-          }
+          strong { margin-top: 8px;}
         }
 
         .archives {
           .archive {
             position: relative;
             line-height: 44px;
+            &:before { content: ''; position: absolute; left: -22px; top: 50%; margin-top: -4px; width: 8px; height: 8px; border-radius: 50%; background-color: #dddddd;}
             span {
               font-size: 12px;
               color: #888888;

@@ -31,7 +31,7 @@
       </div>
       <div class="main-cont">
         <transition name="multi-fade">
-          <router-view/>
+          <router-view class="page" />
         </transition>
       </div>
     </div>
@@ -122,6 +122,72 @@ export default {
       z-index: -1;
       pointer-events: none;
     }
+
+    .page {
+        .list .item {
+          padding-left: 20px;
+
+          &-name {
+            &:before {
+              content: '';
+              position: absolute;
+              top: 50%;
+              left: -22px;
+              width: 8px;
+              height: 8px;
+              margin-top: -4px;
+              border-radius: 50%;
+              background-color: #dddddd;
+            }
+          }
+
+          &:nth-child(5n + 1) {
+            .item-name {
+              &:before {
+                background-color: #1abc9c;
+              }
+            }
+          }
+
+          &:nth-child(5n + 2) {
+            .item-name {
+              &:before {
+                background-color: #3498db;
+              }
+            }
+          }
+
+          &:nth-child(5n + 3) {
+            .item-name {
+              &:before {
+                background-color: #9b59b6;
+              }
+            }
+          }
+
+          &:nth-child(5n + 4) {
+            .item-name {
+              &:before {
+                background-color: #e67e22;
+              }
+            }
+          }
+
+          &:nth-child(5n + 5) {
+            .item-name {
+              &:before {
+                background-color: #e74c3c;
+              }
+            }
+          }
+
+          .archives {
+            .archive {
+              &:before { content: ''; position: absolute; left: -22px; top: 50%; margin-top: -4px; width: 8px; height: 8px; border-radius: 50%; background-color: #dddddd;}
+            }
+          }
+        }
+      }
   }
 
   .mobile-mode {
