@@ -66,7 +66,7 @@ export default {
     const setMode = () => {
       const w = document.documentElement.clientWidth || document.body.clientWidth;
 
-      mode.value = w > 750 ? 'pc' : 'mobile';
+      mode.value = w > 767 ? 'pc' : 'mobile';
     };
 
     const handleResize = debounce(() => {
@@ -101,6 +101,7 @@ export default {
   @import "./assets/css/_main";
   @import "./assets/css/fonts/iconfont.css";
   @import "./assets/css/fonts/calligraffitti-regular-webfont.css";
+  @import "~github-markdown-css";
 
   #app {
     position: relative;
@@ -327,6 +328,20 @@ export default {
         color: #999999;
         transition: all $animateTime;
       }
+    }
+  }
+
+  .markdown-body {
+    box-sizing: border-box;
+    min-width: 200px;
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 45px;
+  }
+
+  @media (max-width: 767px) {
+    .markdown-body {
+      padding: 15px;
     }
   }
 </style>

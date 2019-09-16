@@ -11,6 +11,11 @@ const router = new Router({
       component: () => import(/* webpackChunkName: "archives" */ './views/Archives.vue'),
     },
     {
+      path: '/archives/:id',
+      name: 'archiveDetails',
+      component: () => import(/* webpackChunkName: "archiveDetails" */ './views/Details.vue'),
+    },
+    {
       path: '/labels',
       name: 'labels',
       component: () => import(/* webpackChunkName: "labels" */ './views/Labels.vue'),
