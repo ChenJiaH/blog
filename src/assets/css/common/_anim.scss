@@ -1,0 +1,36 @@
+@charset "utf-8";
+
+// fade
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.2s;
+}
+.fade-enter, .fade-leave-to
+  /* .list-leave-active for below version 2.1.8 */ {
+  opacity: 0;
+}
+
+// multi-fade
+.multi-fade-leave-active {
+  display: none;
+}
+.multi-fade-enter-active {
+  transition: opacity 0.5s;
+}
+.multi-fade-enter
+  /* .list-leave-active for below version 2.1.8 */ {
+  opacity: 0;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0;}
+  100% { opacity: 1;}
+}
+
+@keyframes loading-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

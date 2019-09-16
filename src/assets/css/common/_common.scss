@@ -1,0 +1,102 @@
+// reset
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fieldset, legend, input, button, textarea, p, blockquote, th, td {
+  margin:0;
+  padding:0
+}
+h1, h2, h3, h4, h5, h6, input, textarea, select, button {
+  font-size:100%;
+  font-weight:normal
+}
+ul, ol {
+  list-style-type:none;
+  list-style-image:none
+}
+li {
+  list-style:none
+}
+a, img {
+  -webkit-touch-callout:none
+}
+a {
+  text-decoration:none;
+  color:#333
+}
+a:active, a:hover {
+  outline:0 none
+}
+a:focus {
+  outerline:1px dotted
+}
+img {
+  vertical-align:middle
+}
+sub, sup {
+  font-size:75%;
+  line-height:0;
+  position:relative;
+  vertical-align:baseline
+}
+sup {
+  top:-0.5em
+}
+sub {
+  bottom:-0.25em
+}
+body, button, input, select, textarea {
+  font-family: San Francisco, PingFang SC, Hiragino Sans GB, Segoe UI, Microsoft Yahei, 微软雅黑, Tahoma, Arial, sans-serif;
+}
+button, input, select, textarea {
+  font-family:inherit;
+  font-size:100%;
+  vertical-align:baseline;
+}
+textarea {
+  overflow:auto;
+  vertical-align:top;
+  resize:vertical;
+}
+section, article, aside, header, footer, nav, figure, menu {
+  display:block;
+  padding:0;
+  margin:0;
+}
+* {
+  -webkit-tap-highlight-color:transparent;
+}
+html, body, form, fieldset, p, div, h1, h2, h3, h4, h5, h6 {
+  -webkit-text-size-adjust:none
+}
+input, button, select, textarea {
+  outline:none;
+  -webkit-appearance:none;
+}
+input {
+  border:none;
+}
+input:focus::-webkit-input-placeholder {
+  color: #efefef;
+}
+html {
+  -ms-text-size-adjust:100%;
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+  font-size:62.5%;
+}
+body {
+  position: relative;
+  font-size:14px;
+  line-height:1;
+}
+article, aside, figcaption, figure, footer, header, nav, section, summary {
+  display:block;
+}
+html, body {
+  width: 100%;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+
+*, *:before, *:after { box-sizing: border-box;}
+.hidden { display: none!important;}
+.v-hidden { visibility: hidden!important;}
