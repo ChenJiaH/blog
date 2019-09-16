@@ -1,6 +1,6 @@
 <template>
   <div class="page-labels">
-    <div class="nav flex flex-middle">
+    <div class="nav flex flex-middle" v-if="archives.labels.length">
       <div class="name flex flex-center flex-middle">标签</div>
       <div class="labels flex-item flex">
         <a class="label flex flex-middle flex-center" :class="[item.name === archives.label && 'active']" href="javascript:;" v-for="item in archives.labels" :key="item.name" v-text="item.name" @click="changeLabel(item)"></a>
@@ -24,21 +24,23 @@
         </ul>
       </div>
     </div>
-    <div class="auxi flex flex-middle flex-center" v-if="archives.none">
-      <i class="iconfont icon-none"></i>
-      <span>目前就这么多啦~</span>
-    </div>
-    <template v-else>
-      <template v-if="archives.loading">
-        <div class="auxi flex flex-middle flex-center">
-          <i class="iconfont icon-loading"></i>
-          <span>正在加载中</span>
-        </div>
-      </template>
+    <template v-if="archives.label">
+      <div class="auxi flex flex-middle flex-center" v-if="archives.none">
+        <i class="iconfont icon-none"></i>
+        <span>目前就这么多啦~</span>
+      </div>
       <template v-else>
-        <div class="flex flex-middle flex-center">
-          <a class="btn-next flex flex-middle flex-center" href="javascript:;" @click="getData">加载更多</a>
-        </div>
+        <template v-if="archives.loading">
+          <div class="auxi flex flex-middle flex-center">
+            <i class="iconfont icon-loading"></i>
+            <span>正在加载中</span>
+          </div>
+        </template>
+        <template v-else>
+          <div class="flex flex-middle flex-center">
+            <a class="btn-next flex flex-middle flex-center" href="javascript:;" @click="getData">加载更多</a>
+          </div>
+        </template>
       </template>
     </template>
   </div>
@@ -150,7 +152,7 @@ export default {
 </script>
 <style lang="scss" scoped>
   .page-labels {
-    .nav {
+    .nav { margin-bottom: 24px;
       .name { width: 40px; height: 40px; background-color: #f0f0f0; border-radius: 50%; color: #555555; margin-left: -18px; margin-right: 8px;}
       .labels { flex-wrap: wrap;
         .label { font-size: 12px; color: #999999; padding: 0 12px; height: 32px; margin-right: 8px; margin-bottom: 8px; border-radius: 15px; background-color: #f6f6f6; transition: all 0.2s;

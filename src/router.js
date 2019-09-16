@@ -16,6 +16,11 @@ const router = new Router({
       component: () => import(/* webpackChunkName: "labels" */ './views/Labels.vue'),
     },
     {
+      path: '/links',
+      name: 'links',
+      component: () => import(/* webpackChunkName: "labels" */ './views/Links.vue'),
+    },
+    {
       path: '/about',
       name: 'about',
       // route level code-splitting
