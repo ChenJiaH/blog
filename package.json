@@ -6,7 +6,8 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "inspect": "vue-cli-service inspect"
+    "inspect": "vue-cli-service inspect",
+    "deploy": "sh build/deploy.sh"
   },
   "dependencies": {
     "@vue/composition-api": "^0.3.0",
