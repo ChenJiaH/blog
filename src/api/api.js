@@ -9,6 +9,8 @@ const endpoint = 'https://api.github.com/graphql';
 const graphQLClient = new GraphQLClient(endpoint, {
   headers: {
     authorization: `bearer ${config.tokenA}${config.tokenB}`,
+    'X-Requested-With': 'XMLHttpRequest',
+    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
   },
 });
 
