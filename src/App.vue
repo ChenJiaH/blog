@@ -1,37 +1,39 @@
 <template>
   <div id="app" :class="mode + '-mode'">
-    <div class="header">
-      <template v-if="mode === 'pc'">
-        <div class="breadcrumb">
-          <p v-text="name"></p>
-          <i class="iconfont icon-location"></i>
-        </div>
-        <div class="nav flex">
-          <a class="nav-item nav-home flex flex-middle flex-center" href="https://chenjiahao.xyz" rel="noopener noreferer">
-            <span>盒子</span>
-            <i class="iconfont icon-home"></i>
+    <div class="main-wrap">
+      <div class="header">
+        <template v-if="mode === 'pc'">
+          <div class="breadcrumb">
+            <p v-text="name"></p>
+            <i class="iconfont icon-location"></i>
+          </div>
+          <div class="nav flex">
+            <a class="nav-item nav-home flex flex-middle flex-center" href="https://chenjiahao.xyz" rel="noopener noreferer">
+              <span>盒子</span>
+              <i class="iconfont icon-home"></i>
+            </a>
+            <div class="list flex flex-middle">
+              <router-link class="nav-item flex flex-middle flex-center" :to="nav.path" v-for="(nav, index) in navs" :key="index">
+                <span v-text="nav.name"></span>
+              </router-link>
+            </div>
+          </div>
+        </template>
+        <div class="info" :class="[mode === 'pc' ? 'flex flex-middle' : 'flex-center']">
+          <a class="avatar" href="javascript:;">
+            <img src="img/avatar.png" alt="">
           </a>
-          <div class="list flex flex-middle">
-            <router-link class="nav-item flex flex-middle flex-center" :to="nav.path" v-for="(nav, index) in navs" :key="index">
-              <span v-text="nav.name"></span>
-            </router-link>
+          <div class="flex-item">
+            <h3 class="font-clg">McChen</h3>
+            <p>No pain, no gains!</p>
           </div>
         </div>
-      </template>
-      <div class="info" :class="[mode === 'pc' ? 'flex flex-middle' : 'flex-center']">
-        <a class="avatar" href="javascript:;">
-          <img src="img/avatar.png" alt="">
-        </a>
-        <div class="flex-item">
-          <h3>McChen</h3>
-          <p>No pain, no gains!</p>
-        </div>
       </div>
-    </div>
-    <div class="main-cont">
-      <transition name="multi-fade">
-        <router-view/>
-      </transition>
+      <div class="main-cont">
+        <transition name="multi-fade">
+          <router-view/>
+        </transition>
+      </div>
     </div>
   </div>
 </template>
@@ -101,34 +103,58 @@ export default {
   @import "./assets/css/fonts/calligraffitti-regular-webfont.css";
 
   #app {
+    position: relative;
   }
 
   .pc-mode {
     width: 500px;
     margin: 0 auto;
     padding: 40px 0 80px;
-    border-left: 4px solid #f9f9f9;
+    min-height: calc(100vh + 1px);
+    &:before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 80px;
+      width: 4px;
+      bottom: 80px;
+      background-color: #f9f9f9;
+      z-index: -1;
+      pointer-events: none;
+    }
   }
 
   .mobile-mode {
     width: 100%;
-    padding: 32px 16px 0;
-    .header .info { margin-top: 0;
-      .avatar { margin-left: auto; margin-right: auto;}
-      h3 { margin: 16px 0 4px;}
+    padding: 32px 16px 8px;
+
+    .header .info {
+      margin-top: 0;
+
+      .avatar {
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      h3 {
+        margin: 16px 0 4px;
+      }
     }
   }
 
-  .header { padding-bottom: 32px;
+  .header {
+    padding-bottom: 32px;
+
     .breadcrumb {
       width: 60px;
-      margin-left: -32px;
+      margin-left: -28px;
       text-align: center;
-
+      min-height: 50px;
       p {
         font-size: 13px;
         line-height: 17px;
         color: #d0d0d0;
+        height: 17px;
       }
 
       i {
@@ -140,9 +166,9 @@ export default {
 
     .nav {
       margin-top: 8px;
-
+      min-height: 40px;
       .nav-home {
-        margin-left: -22px;
+        margin-left: -18px;
 
         span {
           font-size: 13px;
@@ -204,6 +230,7 @@ export default {
 
     .info {
       margin-top: 16px;
+
       .avatar {
         display: block;
         width: 60px;
@@ -211,7 +238,7 @@ export default {
         border-radius: 50%;
         overflow: hidden;
         object-fit: cover;
-        margin-left: -32px;
+        margin-left: -28px;
         margin-right: 8px;
 
         img {
@@ -220,9 +247,9 @@ export default {
       }
 
       h3 {
-        font-family: "calligraffitti-regular-webfont";
         font-weight: bold;
         font-size: 24px;
+        line-height: 1.5;
         transition: all 0.2s;
       }
 

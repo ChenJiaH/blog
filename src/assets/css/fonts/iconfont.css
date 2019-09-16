@@ -1,8 +1,8 @@
 @font-face {font-family: "iconfont";
-  src: url('iconfont.eot?t=1567654733669'); /* IE9 */
-  src: url('iconfont.eot?t=1567654733669#iefix') format('embedded-opentype'), /* IE6-IE8 */
-  url('iconfont.woff?t=1567654733669') format('woff'),
-  url('iconfont.ttf?t=1567654733669') format('truetype'); /* chrome, firefox, opera, Safari, Android, iOS 4.2+ */
+  src: url('./iconfont.eot?t=1568600941274'); /* IE9 */
+  src: url('./iconfont.eot?t=1568600941274#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('./iconfont.woff?t=1568600941274') format('woff'),
+  url('./iconfont.ttf?t=1568600941274') format('truetype'); /* chrome, firefox, opera, Safari, Android, iOS 4.2+ */
 }
 
 .iconfont {
@@ -65,12 +65,28 @@
   content: "\e704";
 }
 
+.icon-comment:before {
+  content: "\e614";
+}
+
+.icon-loading:before {
+  content: "\e60a";
+}
+
 .icon-home:before {
   content: "\e679";
 }
 
 .icon-wechat:before {
   content: "\e738";
+}
+
+.icon-none:before {
+  content: "\e643";
+}
+
+.icon-time:before {
+  content: "\e909";
 }
 
 .icon-location:before {

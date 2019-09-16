@@ -20,6 +20,42 @@ const getTime = Date.now || function () {
   return new Date().getTime();
 };
 
+const formatTime = (time, _format) => {
+  if (!time) {
+    return null;
+  }
+  const date = typeof time === 'string' && time.length === 10 ? time.replace(/-/g, '/') : time;
+  const t = new Date(date);
+  const format = _format || 'yyyy-MM-dd';
+  const tf = function (i) {
+    return (i < 10 ? '0' : '') + i;
+  };
+  return format.replace(/yyyy|MM|dd|HH|mm|ss/g, (a) => {
+    switch (a) {
+      case 'yyyy':
+        return tf(t.getFullYear());
+      case 'MM':
+        return tf(t.getMonth() + 1);
+      case 'mm':
+        return tf(t.getMinutes());
+      case 'dd':
+        return tf(t.getDate());
+      case 'HH':
+        return tf(t.getHours());
+      case 'ss':
+        return tf(t.getSeconds());
+      default:
+        break;
+    }
+    return null;
+  });
+};
+
+const getZodiac = (year) => {
+  const map = ['shu', 'niu', 'hu', 'tu', 'long', 'she', 'ma', 'yang', 'hou', 'ji', 'gou', 'zhu'];
+  return year ? map[(parseFloat(year) + 8) % 12] : '';
+};
+
 const restArguments = function (func, startIdx) {
   const startIndex = startIdx == null ? func.length - 1 : +startIdx;
   return function (...argus) {
@@ -135,5 +171,5 @@ const throttle = (func, wait, options = {}) => {
 };
 
 export {
-  pageLock, pageUnlock, getTime, debounce, throttle,
+  debounce, formatTime, getTime, getZodiac, pageLock, pageUnlock, throttle,
 };

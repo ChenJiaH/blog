@@ -4,7 +4,7 @@
     <transition name="fade">
       <div class="loading-cont flex flex-middle flex-center" v-show="show">
         <div>
-          <i class="icon-loading"></i>
+          <i class="icon"></i>
           <p class="text" v-text="text"></p>
         </div>
       </div>
@@ -53,7 +53,7 @@ export default createComponent({
       box-sizing: border-box;
       padding: 0 10px;
 
-      .icon-loading {
+      .icon {
         display: block;
         width: 34px;
         height: 34px;
