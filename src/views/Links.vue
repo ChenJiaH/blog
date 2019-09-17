@@ -64,14 +64,5 @@ export default {
       }
       p { font-size: $sizeMedium; color: #dddddd; line-height: 24px;}
     }
-
-    .btn-next {
-      width: 100px;
-      height: 32px;
-      border: 1px solid #eeeeee;
-      border-radius: 16px;
-      color: #888888;
-      margin-top: 8px;
-    }
   }
 </style>

@@ -158,7 +158,7 @@ export default {
       .name { font-size: $sizeNormal; width: 40px; height: 40px; background-color: #f0f0f0; border-radius: 50%; color: #555555; margin-right: 8px;}
       .labels { flex-wrap: wrap;
         .label { font-size: $sizeSmall; color: #999999; padding: 0 12px; height: 32px; margin-right: 8px; margin-bottom: 8px; border-radius: 15px; background-color: #f6f6f6; transition: all $animateTime;
-          &.active, &:hover { color: $mainStrong; background-color: #f0f0f0;}
+          &.active, &:hover, &:active { color: $mainStrong; background-color: #f0f0f0;}
         }
       }
     }
@@ -193,7 +193,7 @@ export default {
               overflow: hidden;
               transition: all 0.5s;
 
-              &:hover {
+              &:hover,&:active {
                 color: #1abc9c;
               }
             }
@@ -214,30 +214,6 @@ export default {
       .item + .item {
         margin-top: 40px;
       }
-    }
-
-    .auxi {
-      color: #cccccc;
-      font-size: $sizeSmall;
-      line-height: 32px;
-      margin-top: 8px;
-
-      i {
-        margin-right: 8px;
-      }
-
-      .icon-loading {
-        animation: loading-rotate 1.2s linear infinite;
-      }
-    }
-
-    .btn-next {
-      width: 100px;
-      height: 32px;
-      border: 1px solid #eeeeee;
-      border-radius: 16px;
-      color: #888888;
-      margin-top: 8px;
     }
   }
 </style>

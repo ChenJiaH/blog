@@ -102,7 +102,7 @@ export default {
   @import "./assets/css/fonts/iconfont.css";
   @import "./assets/css/fonts/calligraffitti-regular-webfont.css";
   @import "~github-markdown-css";
-
+  body { background-color: #ffffff;}
   #app {
     position: relative;
   }
@@ -329,6 +329,30 @@ export default {
         transition: all $animateTime;
       }
     }
+  }
+
+  .auxi {
+    color: #cccccc;
+    font-size: $sizeSmall;
+    line-height: 32px;
+    margin-top: 8px;
+
+    i {
+      margin-right: 8px;
+    }
+
+    .icon-loading {
+      animation: loading-rotate 1.2s linear infinite;
+    }
+  }
+
+  .btn-next {
+    width: 100px;
+    height: 32px;
+    border: 1px solid #eeeeee;
+    border-radius: 16px;
+    color: #888888;
+    margin-top: 8px;
   }
 
   .markdown-body {
