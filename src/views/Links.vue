@@ -30,6 +30,11 @@ export default {
         bio: 'Find the bug of the world',
         name: 'Forsigner',
         url: 'http://forsigner.com',
+      }, {
+        avatar: 'http://forsigner.com/images/avatar.jpg',
+        bio: 'Find the bug of the world',
+        name: 'Forsigner',
+        url: 'http://forsigner.com',
       }],
     };
   },
@@ -43,8 +48,8 @@ export default {
     }
   }
   .mobile-mode {
-    .page-links .links {
-      &:before { content: ''; position: absolute; left: 0; right: 0; top: -12px; height: 1px; background-image: linear-gradient(0deg, transparent, #d5d5d5, transparent); background-image: -webkit-linear-gradient(0deg, transparent, #d5d5d5, transparent);}
+    .page-links .links { margin-top: 8px;
+      &:before { content: ''; position: absolute; left: 0; right: 0; top: -16px; height: 1px; background-image: linear-gradient(0deg, transparent, #d5d5d5, transparent); background-image: -webkit-linear-gradient(0deg, transparent, #d5d5d5, transparent);}
     }
   }
   .page-links {

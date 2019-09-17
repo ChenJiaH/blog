@@ -68,7 +68,9 @@
 import {
   ref, reactive, watch, onBeforeUnmount,
 } from '@vue/composition-api';
-import { debounce, throttle } from './utils/utils';
+import {
+  debounce, throttle, pageUnlock, pageLock,
+} from './utils/utils';
 
 export default {
   setup(props, context) {
@@ -84,6 +86,9 @@ export default {
     }, {
       path: '/about',
       name: '关于',
+    }, {
+      path: '/board',
+      name: '留言',
     }, {
       path: '/search',
       name: '搜索',
@@ -126,15 +131,20 @@ export default {
       window.removeEventListener('scroll', handleScroll);
     });
 
-    const clickNav = (path) => {
-      global.showModal = false;
-      if (!~context.root.$route.path.indexOf(path)) {
-        context.root.$router.push(path);
+    const toggleModal = () => {
+      global.showModal = !global.showModal;
+      if (global.showModal) {
+        pageLock();
+      } else {
+        pageUnlock();
       }
     };
 
-    const toggleModal = () => {
-      global.showModal = !global.showModal;
+    const clickNav = (path) => {
+      toggleModal();
+      if (!~context.root.$route.path.indexOf(path)) {
+        context.root.$router.push(path);
+      }
     };
 
     let timer = null;
@@ -184,7 +194,7 @@ export default {
   }
 
   .pc-mode {
-    width: 500px;
+    width: 600px;
     margin: 0 auto;
     padding: 40px 0 80px;
     min-height: calc(100vh + 1px);
@@ -373,7 +383,7 @@ export default {
           margin-left: 6px;
         }
 
-        @for $i from 1 through 5 {
+        @for $i from 1 through 6 {
           .nav-item:nth-child(#{$i}) {
             display: none;
             animation: fadeIn 0.8s #{0.1 * ($i - 1)}s both;
@@ -556,12 +566,13 @@ export default {
     min-width: 200px;
     max-width: 980px;
     margin: 0 auto;
-    padding: 45px;
+    padding: 20px;
+    font-size: 14px;
   }
 
   @media (max-width: 767px) {
     .markdown-body {
-      padding: 15px;
+      padding: 20px 0;
     }
   }
 </style>

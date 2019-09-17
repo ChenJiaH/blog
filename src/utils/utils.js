@@ -20,6 +20,12 @@ const getTime = Date.now || function () {
   return new Date().getTime();
 };
 
+const isLightColor = (hex) => {
+  const rgb = [parseInt(`0x${hex.substr(0, 2)}`, 16), parseInt(`0x${hex.substr(2, 2)}`, 16), parseInt(`0x${hex.substr(4, 2)}`, 16)];
+  const darkness = 1 - (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
+  return darkness < 0.5;
+};
+
 const formatTime = (time, _format) => {
   if (!time) {
     return null;
@@ -171,5 +177,5 @@ const throttle = (func, wait, options = {}) => {
 };
 
 export {
-  debounce, formatTime, getTime, getZodiac, pageLock, pageUnlock, throttle,
+  debounce, formatTime, getTime, getZodiac, isLightColor, pageLock, pageUnlock, throttle,
 };
