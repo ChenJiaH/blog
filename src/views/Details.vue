@@ -80,12 +80,13 @@ export default {
   .pc-mode {
     .page-details {
       .title { padding-left: 20px;}
+      .labels { padding-left: 20px;}
     }
   }
   .page-details {
     .title { font-size: 24px; font-weight: bold; line-height: 32px; color: $mainStrong;}
-    .labels { padding: 12px;
-      .label { padding: 0 8px; font-size: 14px; line-height: 24px; border-radius: 3px; box-shadow: inset 0 -1px 0 rgba(27,31,35,0.12); margin: 4px;}
+    .labels { margin-top: 16px;
+      .label { padding: 0 8px; font-size: 14px; line-height: 24px; border-radius: 3px; box-shadow: inset 0 -1px 0 rgba(27,31,35,0.12); margin-right: 8px; margin-bottom: 8px;}
     }
   }
 </style>

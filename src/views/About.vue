@@ -169,7 +169,7 @@ export default {
       }
       .item + .item { padding-top: 16px;}
     }
-    .projects { margin-top: 24px; margin-bottom: 16px;
+    .projects { margin-top: 24px; margin-bottom: 16px; list-style: none;
       .project {
         a { position: relative; cursor: auto;
           h4 { font-size: $sizeMedium; color: $mainStrong; line-height: 1.5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; transition: all $animateTime; cursor: pointer;

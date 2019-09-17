@@ -53,7 +53,7 @@ export default {
     }
   }
   .page-links {
-    .links { position: relative; margin-bottom: 24px;
+    .links { position: relative; margin-bottom: 24px; list-style: none;
       .link {
         .avatar { width: 44px; height: 44px; border-radius: 50%; background-color: #f0f0f0; margin-right: 8px;
           img { width: 100%; height: 100%; border-radius: 50%; overflow: hidden;}

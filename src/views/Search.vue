@@ -174,7 +174,7 @@ export default {
     .archives {
       margin-top: 32px;
       margin-bottom: 16px;
-
+      list-style: none;
       .archive {
         position: relative;
 

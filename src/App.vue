@@ -275,7 +275,7 @@ export default {
           }
         }
 
-        .archives {
+        .archives { list-style: none;
           .archive {
             &:before {
               content: '';
