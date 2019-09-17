@@ -5,7 +5,6 @@ import Loading from './components/loading/loading';
 
 import App from './App.vue';
 import router from './router';
-import './registerServiceWorker';
 
 Vue.use(VueCompositionApi);
 
