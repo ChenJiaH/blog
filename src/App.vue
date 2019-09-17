@@ -48,6 +48,9 @@
               <a class="close flex flex-middle flex-center" href="javascript:;" @click="toggleModal">关闭</a>
             </div>
             <div class="navs flex flex-center flex-middle">
+              <a class="nav-item nav-home flex flex-middle flex-center" href="https://chenjiahao.xyz" rel="noopener noreferer">
+                <i class="iconfont icon-home"></i>
+              </a>
               <a class="nav-item flex flex-middle flex-center" href="javascript:;" v-for="(nav, index) in navs" :key="index" @click="clickNav(nav.path)">
                 <span v-text="nav.name"></span>
               </a>
@@ -508,6 +511,10 @@ export default {
           transition: all 0.5s;
           color: #555555;
 
+          i {
+            font-size: 22px;
+            color: #999999;
+          }
           &:active {
             background-color: #dfdfdf;
           }
