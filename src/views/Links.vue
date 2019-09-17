@@ -30,11 +30,6 @@ export default {
         bio: 'Find the bug of the world',
         name: 'Forsigner',
         url: 'http://forsigner.com',
-      }, {
-        avatar: 'http://forsigner.com/images/avatar.jpg',
-        bio: 'Find the bug of the world',
-        name: 'Forsigner',
-        url: 'http://forsigner.com',
       }],
     };
   },

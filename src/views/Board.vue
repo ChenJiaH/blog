@@ -40,7 +40,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-  .page-board {
+  .pc-mode .page-board {
     #board { padding-left: 20px;}
   }
 </style>
