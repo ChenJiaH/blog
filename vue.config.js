@@ -12,4 +12,5 @@ module.exports = {
     disableHostCheck: true,
     port: 80,
   },
+  productionSourceMap: false,
 };

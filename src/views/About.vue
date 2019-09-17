@@ -173,10 +173,10 @@ export default {
       .project {
         a { position: relative; cursor: auto;
           h4 { font-size: $sizeMedium; color: $mainStrong; line-height: 1.5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; transition: all $animateTime; cursor: pointer;
-            &:hover { color: #1abc9c;}
+            &:hover,&:active { color: #1abc9c;}
           }
           i { color: $main; transition: color $animateTime; cursor: pointer; margin-right: 10px;
-            &:hover { color: $mainStrong;}
+            &:hover,&:active { color: $mainStrong;}
           }
           img { cursor: pointer; margin-left: 8px;}
         }
