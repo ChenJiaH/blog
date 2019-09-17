@@ -1,8 +1,8 @@
 @font-face {font-family: "iconfont";
-  src: url('./iconfont.eot?t=1568620669992'); /* IE9 */
-  src: url('./iconfont.eot?t=1568620669992#iefix') format('embedded-opentype'), /* IE6-IE8 */
-  url('./iconfont.woff?t=1568620669992') format('woff'),
-  url('./iconfont.ttf?t=1568620669992') format('truetype'); /* chrome, firefox, opera, Safari, Android, iOS 4.2+ */
+  src: url('./iconfont.eot?t=1568688549116'); /* IE9 */
+  src: url('./iconfont.eot?t=1568688549116#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('./iconfont.woff?t=1568688549116') format('woff'),
+  url('./iconfont.ttf?t=1568688549116') format('truetype'); /* chrome, firefox, opera, Safari, Android, iOS 4.2+ */
 }
 
 .iconfont {
@@ -11,6 +11,10 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-backtop:before {
+  content: "\e613";
 }
 
 .icon-hu:before {

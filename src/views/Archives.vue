@@ -153,7 +153,7 @@ export default {
               overflow: hidden;
               transition: all 0.5s;
 
-              &:hover {
+              &:hover,&:active {
                 color: #1abc9c;
               }
             }
@@ -174,30 +174,6 @@ export default {
       .item + .item {
         margin-top: 40px;
       }
-    }
-
-    .auxi {
-      color: #cccccc;
-      font-size: $sizeSmall;
-      line-height: 32px;
-      margin-top: 8px;
-
-      i {
-        margin-right: 8px;
-      }
-
-      .icon-loading {
-        animation: loading-rotate 1.2s linear infinite;
-      }
-    }
-
-    .btn-next {
-      width: 100px;
-      height: 32px;
-      border: 1px solid #eeeeee;
-      border-radius: 16px;
-      color: #888888;
-      margin-top: 8px;
     }
   }
 </style>

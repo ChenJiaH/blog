@@ -43,12 +43,12 @@ export default {
     }
   }
   .mobile-mode {
-    .page-links .links {
-      &:before { content: ''; position: absolute; left: 0; right: 0; top: -12px; height: 1px; background-image: linear-gradient(0deg, transparent, #d5d5d5, transparent); background-image: -webkit-linear-gradient(0deg, transparent, #d5d5d5, transparent);}
+    .page-links .links { margin-top: 8px;
+      &:before { content: ''; position: absolute; left: 0; right: 0; top: -16px; height: 1px; background-image: linear-gradient(0deg, transparent, #d5d5d5, transparent); background-image: -webkit-linear-gradient(0deg, transparent, #d5d5d5, transparent);}
     }
   }
   .page-links {
-    .links { position: relative; margin-bottom: 24px;
+    .links { position: relative; margin-bottom: 24px; list-style: none;
       .link {
         .avatar { width: 44px; height: 44px; border-radius: 50%; background-color: #f0f0f0; margin-right: 8px;
           img { width: 100%; height: 100%; border-radius: 50%; overflow: hidden;}
@@ -63,15 +63,6 @@ export default {
         i { font-size: $sizeMedium; color: #ffffff;}
       }
       p { font-size: $sizeMedium; color: #dddddd; line-height: 24px;}
-    }
-
-    .btn-next {
-      width: 100px;
-      height: 32px;
-      border: 1px solid #eeeeee;
-      border-radius: 16px;
-      color: #888888;
-      margin-top: 8px;
     }
   }
 </style>

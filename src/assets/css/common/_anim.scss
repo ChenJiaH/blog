@@ -21,6 +21,16 @@
   opacity: 0;
 }
 
+// slide-down
+.slide-down-enter-active {
+  transition: transform 0.3s ease-out;
+  transform: translate(0, 0) translateZ(0);
+}
+.slide-down-enter, .slide-down-leave-active
+  /* .list-leave-active for below version 2.1.8 */ {
+  transform: translate(0, 100%) translateZ(0);
+}
+
 @keyframes fadeIn {
   0% { opacity: 0;}
   100% { opacity: 1;}

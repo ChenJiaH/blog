@@ -1,4 +1,5 @@
 module.exports = {
+  publicPath: './',
   lintOnSave: false,
   css: {
     loaderOptions: {
@@ -7,4 +8,9 @@ module.exports = {
       },
     },
   },
+  devServer: {
+    disableHostCheck: true,
+    port: 80,
+  },
+  productionSourceMap: false,
 };
