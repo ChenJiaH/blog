@@ -1,4 +1,4 @@
-<h1 align="center">Welcome to Blog 👋</h1>
+<h1 align="center">欢迎来到我的博客 👋</h1>
 <p>
   <a href="https://github.com/ChenJiaH/blog/blob/master/package.json">
     <img alt="Version" src="https://img.shields.io/badge/version-0.1.0-blue.svg?cacheSeconds=2592000">
@@ -14,26 +14,26 @@
   </a>
 </p>
 
-> <b>Issues are forbid!</b>
+> <b>禁止提交ISSUE!</b>
 
-### 🏠 [Homepage](https://chenjiahao.xyz/blog)
+### 🏠 [首页](https://chenjiahao.xyz/blog)
 
-## Official Account
+## 公众号
 
-![Wechat - 前端成长记](https://raw.githubusercontent.com/ChenJiaH/chenjiah.github.io/master/official-account.jpg)
+![微信公众号 - 前端成长记](https://raw.githubusercontent.com/ChenJiaH/chenjiah.github.io/master/official-account.jpg)
 
-## Author
+## 作者
 
 👤 **McChen**
 
 * Twitter: [@F2E_McChen](https://twitter.com/F2E_McChen)
 * Github: [@ChenJiaH](https://github.com/ChenJiaH)
 
-## Show your support
+## 支持我
 
-Give a ⭐️ if this project helped you!
+您可以给我一个 ⭐️鼓励我更好地创作!
 
-## 📝 License
+## 📝 协议
 
 Copyright © 2019 [McChen](https://github.com/ChenJiaH).<br />
 This project is [MIT](https://github.com/ChenJiaH/blog/blob/master/LICENSE) licensed.
