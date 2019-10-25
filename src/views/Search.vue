@@ -76,7 +76,7 @@ export default {
         if (!pageInfo.hasNextPage) {
           archives.none = true;
         }
-        archives.cursor = pageInfo.endCursor;
+        archives.cursor = `"${pageInfo.endCursor}"`;
         archives.list = archives.list.concat(nodes);
         archives.totalCount = issueCount;
       });

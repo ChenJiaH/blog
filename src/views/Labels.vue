@@ -68,7 +68,7 @@ export default {
       archives.loading = true;
       const query = `query {
           repository(owner: "ChenJiaH", name: "blog") {
-            issues(filterBy: {labels: ${archives.label}}, orderBy: {field: CREATED_AT, direction: DESC}, labels: null, first: 10, after: ${archives.cursor}) {
+            issues(filterBy: {labels: "${archives.label}"}, orderBy: {field: CREATED_AT, direction: DESC}, labels: null, first: 10, after: ${archives.cursor}) {
               nodes {
                 title
                 createdAt
@@ -91,7 +91,7 @@ export default {
         if (!pageInfo.hasNextPage) {
           archives.none = true;
         }
-        archives.cursor = pageInfo.endCursor;
+        archives.cursor = `"${pageInfo.endCursor}"`;
         archives.list = archives.list.concat(nodes);
         archives.totalCount = totalCount;
       });
