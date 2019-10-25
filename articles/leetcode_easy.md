@@ -7,9 +7,16 @@
  - 查阅他人解法
  - 思考总结
 
+## 目录
+
+- [1.两数之和](#1.两数之和)
+- [7.整数反转](#7.整数反转)
+
 ## Easy
 
 ### 1.两数之和
+
+[题目地址](https://leetcode-cn.com/problems/two-sum/)
 
 #### 题目描述
 
@@ -17,7 +24,7 @@
 
 你可以假设每种输入只会对应一个答案。但是，你不能重复利用这个数组中同样的元素。
 
-示例:
+示例：
 
 ```javascript
  给定 nums = [2, 7, 11, 15], target = 9
@@ -201,4 +208,128 @@ var twoSum = function(nums, target) {
 
 这里我做个了简单的校验：输入 `[2,2,2], 4` ，发现期望输出是 `[0, 2]` ，而不是 `[0, 1]` ,所以上面有几种解法实际上都过不了。如果是为了满足这种输出，我的推荐方案是 `两次遍历 HashMap` 。但是我个人是觉得 `HashMap` 一次遍历是更合理的。
 
+### 7.整数反转
 
+[题目地址](https://leetcode-cn.com/problems/reverse-integer/)
+
+#### 题目描述
+
+给出一个 32 位的有符号整数，你需要将这个整数中每位上的数字进行反转。
+
+示例:
+
+```javascript
+输入: 123
+输出: 321
+
+输入: -123
+输出: -321
+
+输入: 120
+输出: 21
+```
+
+注意:
+
+假设我们的环境只能存储得下 32 位的有符号整数，则其数值范围为 `[−2^31,  2^31 − 1]`。请根据这个假设，如果反转后整数溢出那么就返回 0。
+
+#### 题目分析设想
+
+从题干上来看，有几个要注意的点：
+
+- 溢出返回 `0`
+- `0` 为首位需要去掉取自然数
+
+这里我有两种思路：
+
+- 利用数组反转 `reverse` 来反转再做自然数转换
+- 取余拿到每位上的数字再做加法和符号及溢出处理
+
+#### 编写代码验证
+
+**Ⅰ.数组反转**
+
+代码：
+
+```javascript
+ * @param {number} x
+ * @return {number}
+ */
+var reverse = function(x) {
+    const isNegative = x < 0
+    const rev = Number(Math.abs(x).toString().split('').reverse().join(''))
+    if (isNegative && -rev >= -Math.pow(2, 31)) {
+        return -rev
+    } else if (!isNegative && rev <= Math.pow(2,31) - 1) {
+        return rev
+    } else {
+        return 0
+    }
+};
+```
+
+结果：
+
+- 1032/1032 cases passed (96 ms)
+- Your runtime beats 73.33 % of javascript submissions
+- Your memory usage beats 28.03 % of javascript submissions (35.9 MB)
+
+**Ⅱ.取余**
+
+代码：
+
+```javascript
+/**
+ * @param {number} x
+ * @return {number}
+ */
+var reverse = function(x) {
+    const isNegative = x < 0
+    let res = 0
+    while(x !== 0) {
+        res = res * 10 + x % 10
+        x = parseInt(x / 10)
+    }
+    if ((isNegative && res >= -Math.pow(2, 31)) || (!isNegative && res <= Math.pow(2,31) - 1)) {
+        return res
+    } else {
+        return 0
+    }
+};
+```
+
+结果：
+
+- 1032/1032 cases passed (80 ms)
+- Your runtime beats 96.71 % of javascript submissions
+- Your memory usage beats 56.8 % of javascript submissions (35.7 MB)
+
+对比发现，使用取余的方式，性能上明显优于数组反转。
+
+#### 查阅他人解法
+
+思路基本上都是这两种，未发现方向不同的解法。
+
+#### 思考总结
+
+对比发现还有一些考虑不周的地方需要补全，比如说一些特殊值可直接返回，避免运算。这里我也做了一个简单的校验：输入 `-0`，发现期望输出是 `0` 而不是 `-0`。所以，我这里的代码做一些优化，如下：
+
+```javascript
+/**
+ * @param {number} x
+ * @return {number}
+ */
+var reverse = function(x) {
+    if (x === 0) return 0
+    function isOverflow (num) {
+        return num < -Math.pow(2, 31) || (num > Math.pow(2,31) - 1)
+    }
+    if (isOverflow(x)) return 0
+    let res = 0
+    while(x !== 0) {
+        res = res * 10 + x % 10
+        x = parseInt(x / 10)
+    }
+    return isOverflow(res) ? 0 : res
+};
+```
