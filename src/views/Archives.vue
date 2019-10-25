@@ -81,7 +81,7 @@ export default {
         if (!pageInfo.hasNextPage) {
           archives.none = true;
         }
-        archives.cursor = pageInfo.endCursor;
+        archives.cursor = `"${pageInfo.endCursor}"`;
 
         nodes.forEach((archive) => {
           const year = parseFloat(archive.createdAt.substr(0, 4));
