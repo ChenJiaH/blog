@@ -12,6 +12,7 @@
 - [1.两数之和](#1两数之和)
 - [7.整数反转](#7整数反转)
 - [9.回文数](#9回文数)
+- [14.罗马数字转整数](#14罗马数字转整数)
 
 ## Easy
 
@@ -490,3 +491,196 @@ var isPalindrome = function(x) {
 #### 思考总结
 
 综上，最推荐翻转一半的解法。
+
+### 14.罗马数字转整数
+
+[题目地址](https://leetcode-cn.com/problems/roman-to-integer/)
+
+#### 题目描述
+
+罗马数字包含以下七种字符: `I， V， X， L，C，D` 和 `M`。
+
+| 字符 | 数值 |
+| :----: | :----: |
+| I | 1 |
+| V | 5 |
+| X | 10 |
+| L | 50 |
+| C | 100 |
+| D | 500 |
+| M | 1000 |
+
+例如， 罗马数字 2 写做 `II` ，即为两个并列的 1。12 写做 `XII` ，即为 `X + II` 。 27 写做  `XXVII`, 即为 `XX + V + II` 。
+
+通常情况下，罗马数字中小的数字在大的数字的右边。但也存在特例，例如 4 不写做 `IIII`，而是 `IV`。数字 1 在数字 5 的左边，所表示的数等于大数 5 减小数 1 得到的数值 4 。同样地，数字 9 表示为 `IX`。这个特殊的规则只适用于以下六种情况：
+
+- `I` 可以放在 `V` (5) 和 `X` (10) 的左边，来表示 4 和 9。
+- `X` 可以放在 `L` (50) 和 `C` (100) 的左边，来表示 40 和 90。 
+- `C` 可以放在 `D` (500) 和 `M` (1000) 的左边，来表示 400 和 900。
+
+给定一个罗马数字，将其转换成整数。输入确保在 1 到 3999 的范围内。
+
+示例：
+
+```javascript
+输入: "III"
+输出: 3
+
+输入: "IV"
+输出: 4
+
+输入: "IX"
+输出: 9
+
+输入: "LVIII"
+输出: 58
+解释: L = 50, V= 5, III = 3.
+
+输入: "MCMXCIV"
+输出: 1994
+解释: M = 1000, CM = 900, XC = 90, IV = 4.
+```
+
+#### 题目分析设想
+
+这道题有个比较直观的想法，因为特殊情况有限可枚举，所以我这里有两个方向：
+
+- 枚举所有特殊组合，然后进行字符串遍历
+- 直接字符串遍历，判断当前位和后一位的大小
+
+#### 编写代码验证
+
+**Ⅰ.枚举特殊组合**
+
+代码：
+
+```javascript
+/**
+ * @param {string} s
+ * @return {number}
+ */
+var romanToInt = function(s) {
+    const hash = {
+        'I': 1,
+        'IV': 4,
+        'V': 5,
+        'IX': 9,
+        'X': 10,
+        'XL': 40,
+        'L': 50,
+        'XC': 90,
+        'C': 100,
+        'CD': 400,
+        'D': 500,
+        'CM': 900,
+        'M': 1000
+    }
+    let res = 0
+    for(let i = 0; i < s.length;) {
+        if (i < s.length - 1 && hash[s.substring(i, i + 2)]) { // 在 hash 表中，说明是特殊组合
+            res += hash[s.substring(i, i + 2)]
+            i += 2
+        } else {
+            res += hash[s.charAt(i)]
+            i += 1
+        }
+    }
+    return res
+};
+```
+
+结果:
+
+- 3999/3999 cases passed (176 ms)
+- Your runtime beats 77.06 % of javascript submissions
+- Your memory usage beats 80.86 % of javascript submissions (39.8 MB)
+- 时间复杂度： `O(n)`
+
+**Ⅱ.直接遍历**
+
+代码：
+
+```javascript
+/**
+ * @param {string} s
+ * @return {number}
+ */
+var romanToInt = function(s) {
+    const hash = {
+        'I': 1,
+        'V': 5,
+        'X': 10,
+        'L': 50,
+        'C': 100,
+        'D': 500,
+        'M': 1000
+    }
+    let res = 0
+    for(let i = 0; i < s.length; i++) {
+        if (i === s.length - 1) {
+            res += hash[s.charAt(i)]
+        } else {
+            if (hash[s.charAt(i)] >= hash[s.charAt(i + 1)]) {
+                res += hash[s.charAt(i)]
+            } else {
+                res -= hash[s.charAt(i)]
+            }
+        }
+    }
+    return res
+};
+```
+
+结果：
+
+- 3999/3999 cases passed (176 ms)
+- Your runtime beats 84.42 % of javascript submissions
+- Your memory usage beats 90.55 % of javascript submissions (39.6 MB)
+- 时间复杂度： `O(n)`
+
+##### 查阅他人解法
+
+这里还看到一种方式，全部先按加法算，如果有前一位小于后一位的情况，直接减正负差值 `2/20/200` 。来看看代码：
+
+**Ⅰ.差值运算**
+
+代码：
+
+```javascript
+/**
+ * @param {string} s
+ * @return {number}
+ */
+var romanToInt = function(s) {
+    const hash = {
+        'I': 1,
+        'V': 5,
+        'X': 10,
+        'L': 50,
+        'C': 100,
+        'D': 500,
+        'M': 1000
+    }
+    let res = 0
+    for(let i = 0; i < s.length; i++) {
+        res += hash[s.charAt(i)]
+        if (i < s.length - 1 && hash[s.charAt(i)] < hash[s.charAt(i + 1)]) {
+            res -= 2 * hash[s.charAt(i)]
+        }
+    }
+    return res
+};
+```
+
+结果：
+
+- 3999/3999 cases passed (232 ms)
+- Your runtime beats 53.57 % of javascript submissions
+- Your memory usage beats 80.05 % of javascript submissions (39.8 MB)
+- 时间复杂度： `O(n)`
+
+换汤不换药，只是做了个加法运算而已，没有太大的本质区别。
+
+#### 思考总结
+
+综上，暂时没有看到一些方向上不一致的解法。我这里推荐字符串直接遍历的解法，性能最佳。
