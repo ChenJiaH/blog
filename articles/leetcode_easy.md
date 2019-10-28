@@ -12,7 +12,8 @@
 - [1.两数之和](#1两数之和)
 - [7.整数反转](#7整数反转)
 - [9.回文数](#9回文数)
-- [14.罗马数字转整数](#14罗马数字转整数)
+- [13.罗马数字转整数](#13罗马数字转整数)
+- [14.最长公共前缀](#14最长公共前缀)
 
 ## Easy
 
@@ -492,7 +493,7 @@ var isPalindrome = function(x) {
 
 综上，最推荐翻转一半的解法。
 
-### 14.罗马数字转整数
+### 13.罗马数字转整数
 
 [题目地址](https://leetcode-cn.com/problems/roman-to-integer/)
 
@@ -515,7 +516,7 @@ var isPalindrome = function(x) {
 通常情况下，罗马数字中小的数字在大的数字的右边。但也存在特例，例如 4 不写做 `IIII`，而是 `IV`。数字 1 在数字 5 的左边，所表示的数等于大数 5 减小数 1 得到的数值 4 。同样地，数字 9 表示为 `IX`。这个特殊的规则只适用于以下六种情况：
 
 - `I` 可以放在 `V` (5) 和 `X` (10) 的左边，来表示 4 和 9。
-- `X` 可以放在 `L` (50) 和 `C` (100) 的左边，来表示 40 和 90。 
+- `X` 可以放在 `L` (50) 和 `C` (100) 的左边，来表示 40 和 90。
 - `C` 可以放在 `D` (500) 和 `M` (1000) 的左边，来表示 400 和 900。
 
 给定一个罗马数字，将其转换成整数。输入确保在 1 到 3999 的范围内。
@@ -684,3 +685,203 @@ var romanToInt = function(s) {
 #### 思考总结
 
 综上，暂时没有看到一些方向上不一致的解法。我这里推荐字符串直接遍历的解法，性能最佳。
+
+### 14.最长公共前缀
+
+[题目地址](https://leetcode-cn.com/problems/longest-common-prefix/)
+
+#### 题目描述
+
+编写一个函数来查找字符串数组中的最长公共前缀。
+
+如果不存在公共前缀，返回空字符串 ""。
+
+示例：
+
+```javascript
+输入: ["flower","flow","flight"]
+输出: "fl"
+
+输入: ["dog","racecar","car"]
+输出: ""
+解释: 输入不存在公共前缀。
+```
+
+说明:
+
+所有输入只包含小写字母 `a-z` 。
+
+#### 题目分析设想
+
+这道题一看觉得肯定是需要遍历的题，无非是算法上的优劣罢了。我有三个方向来尝试解题：
+
+- 遍历每列，取出数组第一项，逐个取字符串的每一位去遍历数组
+- 遍历每项，取出数组第一项，逐步从后截取，判断是否匹配数组中的每一项
+- 分治，将数组递归不断细成俩部分，分别求最大匹配后，再汇总求最大匹配
+
+#### 编写代码验证
+
+**Ⅰ.遍历每列**
+
+代码：
+
+```javascript
+/**
+ * @param {string[]} strs
+ * @return {string}
+ */
+var longestCommonPrefix = function(strs) {
+    if (strs.length === 0) return ''
+    if (strs.length === 1) return strs[0] || ''
+    const str = strs.shift()
+    for(let i = 0; i < str.length; i++) {
+        const char = str.charAt(i)
+        for(let j = 0; j < strs.length; j++) {
+            if (i === strs[j].length || strs[j].charAt(i) !== char) {
+                return str.substring(0, i)
+            }
+        }
+    }
+    return str
+};
+```
+
+结果：
+
+- 118/118 cases passed (68 ms)
+- Your runtime beats 89.17 % of javascript submissions
+- Your memory usage beats 57.83 % of javascript submissions (34.8 MB)
+- 时间复杂度： `O(n)`
+
+**Ⅱ.遍历每项**
+
+代码：
+
+```javascript
+/**
+ * @param {string[]} strs
+ * @return {string}
+ */
+var longestCommonPrefix = function(strs) {
+    if (strs.length === 0) return ''
+    if (strs.length === 1) return strs[0] || ''
+    let str = strs.shift()
+    for(let i = 0; i < strs.length; i++) {
+        while (strs[i].indexOf(str) !== 0) {
+            str = str.substring(0, str.length - 1);
+            if (!str) return ''
+        }
+    }
+    return str
+};
+```
+
+结果：
+
+- 118/118 cases passed (64 ms)
+- Your runtime beats 94.63 % of javascript submissions
+- Your memory usage beats 96.69 % of javascript submissions (33.5 MB)
+- 时间复杂度： `O(n)`
+
+**Ⅲ.分治**
+
+代码：
+
+```javascript
+/**
+ * @param {string[]} strs
+ * @return {string}
+ */
+var longestCommonPrefix = function(strs) {
+    if (strs.length === 0) return ''
+    if (strs.length === 1) return strs[0] || ''
+    function arrayToString (arr, start, end) {
+        if (start === end) {    // 说明数组中只剩一项了
+            return arr[start]
+        } else {
+            const mid = parseInt((start + end) / 2)
+            const leftStr = arrayToString(arr, start, mid)
+            const rightStr = arrayToString(arr, mid + 1, end)
+            return getCommonPrefix(leftStr, rightStr)
+        }
+    }
+    // 两个字符串取最长前缀
+    function getCommonPrefix(left, right) {
+        const min = Math.min(left.length, right.length)
+        for(let i = 0; i < min; i++) {
+            if (left.charAt(i) !== right.charAt(i)) {
+                return left.substring(0, i)
+            }
+        }
+        return left.substring(0, min)
+    }
+    return arrayToString(strs, 0, strs.length - 1)
+};
+```
+
+结果：
+
+- 118/118 cases passed (60 ms)
+- Your runtime beats 98.09 % of javascript submissions
+- Your memory usage beats 34.54 % of javascript submissions (35.1 MB)
+- 时间复杂度： `O(n)`
+
+#### 查阅他人解法
+
+这里还看见使用二分法，跟分治还是略有差异，是每次丢弃不包含答案的区间来减少运算量。
+
+**Ⅰ.二分法**
+
+代码：
+
+```javascript
+/**
+ * @param {string[]} strs
+ * @return {string}
+ */
+var longestCommonPrefix = function(strs) {
+    if (strs.length === 0) return ''
+    if (strs.length === 1) return strs[0] || ''
+    // 找到最短字符串长度
+    let minLen = 0
+    for(let i = 0; i < strs.length; i++) {
+        minLen = minLen === 0 ? strs[i].length : Math.min(minLen, strs[i].length)
+    }
+
+    function isCommonPrefix (arr, pos) {
+        const str = arr[0].substring(0, pos)    // 取第一项的前一半
+        for(let i = 0 ; i < arr.length; i++) {
+            if (arr[i].indexOf(str) !== 0) {
+                return false
+            }
+        }
+        return true
+    }
+
+    let low = 1
+    let high = minLen   // 截取最大数量
+
+    while (low <= high) {
+        const mid = parseInt((low + high) / 2)
+        if (isCommonPrefix(strs, mid)) {    // 如果前半段是
+            low = mid + 1   // 继续判断后半段
+        } else {
+            high = mid - 1  // 前半段继续对半分继续判断
+        }
+    }
+
+    return strs[0].substring(0, (low + high) / 2)
+};
+```
+
+结果：
+
+- 118/118 cases passed (64 ms)
+- Your runtime beats 94.63 % of javascript submissions
+- Your memory usage beats 93.96 % of javascript submissions (33.5 MB)
+- 时间复杂度： `O(log(n))`
+
+#### 思考总结
+
+具体情况具体分析，比如分治的算法也可以应用在快速排序中。个人比较推荐分治法和二分法求解这道题。
+
