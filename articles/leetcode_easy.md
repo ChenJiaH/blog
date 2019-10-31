@@ -14,6 +14,7 @@
 - [9.回文数](#9回文数)
 - [13.罗马数字转整数](#13罗马数字转整数)
 - [14.最长公共前缀](#14最长公共前缀)
+- [20.有效的括号](#20有效的括号)
 
 ## Easy
 
@@ -885,3 +886,132 @@ var longestCommonPrefix = function(strs) {
 
 具体情况具体分析，比如分治的算法也可以应用在快速排序中。个人比较推荐分治法和二分法求解这道题。
 
+### 20.有效的括号
+
+[题目地址](https://leetcode-cn.com/problems/valid-parentheses/)
+
+#### 题目描述
+
+给定一个只包括 `'('，')'，'{'，'}'，'['，']'` 的字符串，判断字符串是否有效。
+
+有效字符串需满足：
+
+1. 左括号必须用相同类型的右括号闭合。
+2. 左括号必须以正确的顺序闭合。
+
+注意空字符串可被认为是有效字符串。
+
+示例：
+
+```javascript
+输入: "()"
+输出: true
+
+输入: "()[]{}"
+输出: true
+
+输入: "(]"
+输出: false
+
+输入: "([)]"
+输出: false
+
+输入: "{[]}"
+输出: true
+```
+
+#### 题目分析设想
+
+这道题从题面来看，仍然需要对字符串做遍历处理，找到相互匹配的括号，剔除后继续做处理即可。所以这道题我的解题想法是：
+
+- 使用栈来记录，匹配的一对就出栈，最后判断栈是否为空
+
+有几点需要注意下，可以减少一些计算量：
+
+1. 题面说明了字符串只含有三种括号，所以长度为奇数，一定无效
+2. 只要有一对不符合，则可判定一定无效
+3. 堆栈长度超过字符串长度一半，则一定无效
+4. 先找到右括号则一定无效
+
+#### 编写代码验证
+
+**Ⅰ.记录栈**
+
+代码：
+
+```javascript
+/**
+ * @param {string} s
+ * @return {boolean}
+ */
+var isValid = function(s) {
+    if (s === '') return true;
+    if (s.length % 2) return false;
+    // hash 表做好索引
+    const hash = {
+        '(': ')',
+        '[': ']',
+        '{': '}'
+    }
+    let arr = []
+    for (let i = 0; i < s.length; i++) {
+        if (!hash[s.charAt(i)]) { // 推入的是右括号
+            if (!arr.length || hash[arr[arr.length - 1]] !== s.charAt(i)) {
+                return false
+            } else {
+                arr.pop()
+            }
+        } else {
+            if (arr.length >= s / 2) {   // 长度超过一半
+                return false
+            }
+            arr.push(s.charAt(i))
+        }
+    }
+    return !arr.length
+};
+```
+
+结果：
+
+- 76/76 cases passed (64 ms)
+- Your runtime beats 90.67 % of javascript submissions
+- Your memory usage beats 64.59 % of javascript submissions (33.8 MB)
+- 时间复杂度： `O(n)`
+
+#### 查阅他人解法
+
+发现一个很暴力的解法，虽然效率不高，但是思路清奇。我们来看看实现：
+
+**Ⅰ.暴力正则**
+
+代码：
+
+```javascript
+/**
+ * @param {string} s
+ * @return {boolean}
+ */
+var isValid = function(s) {
+    if (s === '') return true;
+    if (s.length % 2) return false;
+
+    while(s.length) {
+        const s_ = s
+        s = s.replace('()','').replace('[]','').replace('{}','')
+        if (s === s_) return false;
+    }
+    return true;
+};
+```
+
+结果：
+
+- 76/76 cases passed (104 ms)
+- Your runtime beats 14.95 % of javascript submissions
+- Your memory usage beats 19.75 % of javascript submissions (35.7 MB)
+- 时间复杂度： `O(n)`
+
+#### 思考总结
+
+就这题而言，我还是更倾向于增加一个辅助栈来做记录。因为一旦去掉只包含括号的限制，那么正则将无法解答。
