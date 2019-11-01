@@ -15,6 +15,7 @@
 - [13.罗马数字转整数](#13罗马数字转整数)
 - [14.最长公共前缀](#14最长公共前缀)
 - [20.有效的括号](#20有效的括号)
+- [21.合并两个有序链表](#20合并两个有序链表)
 
 ## Easy
 
@@ -1015,3 +1016,113 @@ var isValid = function(s) {
 #### 思考总结
 
 就这题而言，我还是更倾向于增加一个辅助栈来做记录。因为一旦去掉只包含括号的限制，那么正则将无法解答。
+
+### 21.合并两个有序链表
+
+[题目地址](https://leetcode-cn.com/problems/merge-two-sorted-lists/)
+
+#### 题目描述
+
+将两个有序链表合并为一个新的有序链表并返回。新链表是通过拼接给定的两个链表的所有节点组成的。
+
+示例：
+
+```javascript
+输入：1->2->4, 1->3->4
+输出：1->1->2->3->4->4
+```
+
+#### 题目分析设想
+
+这道题从题面上就说明了这是一道链表相关问题，要进行链表合并，无非是修改链表指针指向，或者是链表拼接。所以，这道题我有两种思路的解法：
+
+- 修改指针，不断取出某一条链表中的数，插入到另外一条链表
+- 链表拼接，递归比较哪条链表的元素更小，就截取拼接到另一条
+
+两种方式的区别很明显，修改指针的方式需要存储和不断修改指针指向，拼接的方式直接做链表拼接。
+
+当然这里也有一些特殊值需要考虑进来。
+
+#### 编写代码验证
+
+**Ⅰ.修改指针**
+
+代码：
+
+```javascript
+/**
+ * @param {ListNode} l1
+ * @param {ListNode} l2
+ * @return {ListNode}
+ */
+var mergeTwoLists = function(l1, l2) {
+    if (l1 === null) return l2
+    if (l2 === null) return l1
+    // 结果链表
+    let l = new ListNode(0)
+    // 不断更新的当前结点指针，对象赋值为传址，所以下面改指针指向即可
+    let cursor = l
+    // 会有一个先遍历完，变成 null
+    while(l1 !== null && l2 !== null) {
+        if (l1.val <= l2.val) { // 哪个小，指针就指向哪
+            cursor.next = l1
+            l1 = l1.next
+        } else {
+            cursor.next = l2
+            l2 = l2.next
+        }
+        // 可以理解为 l.next.next.next ...
+        cursor = cursor.next
+    }
+    // 有一个为空则可以直接拼接
+    cursor.next = l1 === null ? l2 : l1
+    return l.next
+};
+```
+
+结果：
+
+- 208/208 cases passed (60 ms)
+- Your runtime beats 99.51 % of javascript submissions
+- Your memory usage beats 51.04 % of javascript submissions (35.4 MB)
+- 时间复杂度 `O(m + n)` ，分别代表两个链表长度
+
+**Ⅱ.链表拼接**
+
+代码：
+
+```javascript
+/**
+ * @param {ListNode} l1
+ * @param {ListNode} l2
+ * @return {ListNode}
+ */
+var mergeTwoLists = function(l1, l2) {
+    if (l1 === null) return l2
+    if (l2 === null) return l1
+    if (l1.val < l2.val) {
+        l1.next = mergeTwoLists(l1.next, l2)
+        return l1   // 这个是合并后的了
+    } else {
+        l2.next = mergeTwoLists(l1, l2.next)
+        return l2   // 这个是合并后的了
+    }
+};
+```
+
+结果：
+
+- 208/208 cases passed (68 ms)
+- Your runtime beats 96.41 % of javascript submissions
+- Your memory usage beats 51.04 % of javascript submissions (35.4 MB)
+- 时间复杂度 `O(m + n)` ，分别代表两个链表长度
+
+#### 查阅他人解法
+
+思路基本上都是这两种，未发现方向不同的解法。
+
+无非是有些解法额外开辟了新的链表来记录，或者一些细节上的差异。
+
+#### 思考总结
+
+这里的链表拼接解法，有没有发现跟 [上一期](https://github.com/ChenJiaH/blog/issues/44) 14题中的分治思路是一样的？对，实际上这个也是分治思路的一个应用。
