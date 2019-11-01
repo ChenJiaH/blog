@@ -16,6 +16,7 @@
 - [14.最长公共前缀](#14最长公共前缀)
 - [20.有效的括号](#20有效的括号)
 - [21.合并两个有序链表](#20合并两个有序链表)
+- [26.删除排序数组中的重复项](#26删除排序数组中的重复项)
 
 ## Easy
 
@@ -1126,3 +1127,158 @@ var mergeTwoLists = function(l1, l2) {
 #### 思考总结
 
 这里的链表拼接解法，有没有发现跟 [上一期](https://github.com/ChenJiaH/blog/issues/44) 14题中的分治思路是一样的？对，实际上这个也是分治思路的一个应用。
+
+### 26.删除排序数组中的重复项
+
+[题目地址](https://leetcode-cn.com/problems/remove-duplicates-from-sorted-array/)
+
+#### 题目描述
+
+给定一个排序数组，你需要在**原地**删除重复出现的元素，使得每个元素只出现一次，返回移除后数组的新长度。
+
+不要使用额外的数组空间，你必须在**原地**修改输入数组并在使用 O(1) 额外空间的条件下完成。
+
+示例：
+
+```javascript
+给定数组 nums = [1,1,2],
+
+函数应该返回新的长度 2, 并且原数组 nums 的前两个元素被修改为 1, 2。
+
+你不需要考虑数组中超出新长度后面的元素。
+
+给定 nums = [0,0,1,1,1,2,2,3,3,4],
+
+函数应该返回新的长度 5, 并且原数组 nums 的前五个元素被修改为 0, 1, 2, 3, 4。
+
+你不需要考虑数组中超出新长度后面的元素。
+```
+
+说明:
+
+为什么返回数值是整数，但输出的答案是数组呢?
+
+请注意，输入数组是以“引用”方式传递的，这意味着在函数里修改输入数组对于调用者是可见的。
+
+你可以想象内部操作如下:
+
+```javascript
+// nums 是以“引用”方式传递的。也就是说，不对实参做任何拷贝
+int len = removeDuplicates(nums);
+
+// 在函数里修改输入数组对于调用者是可见的。
+// 根据你的函数返回的长度, 它会打印出数组中该长度范围内的所有元素。
+for (int i = 0; i < len; i++) {
+    print(nums[i]);
+}
+```
+
+
+#### 题目分析设想
+
+如果是单纯的数组去重，那有很多种方法可以做。所以题目也加了限制条件，总结一下比较重要的几点：
+
+- 不要使用额外的数组空间，空间复杂度为 `O(1)`
+- 原地删除重复元素
+- 不需要考虑超过新长度后面的元素
+
+这意味着不允许使用新的数组来解题，也就是对原数组进行操作。最后一点注意点可以看出，数组项的拷贝复制是一个方向，第二点可以看出数组删除是一个方向。删除元素的话就不会超过，所以不需要考虑两者结合。所以这题我分两个方向来解：
+
+- 拷贝数组元素
+- 删除数组元素
+
+#### 编写代码验证
+
+**Ⅰ.拷贝数组元素**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var removeDuplicates = function(nums) {
+    if (nums.length === 0) return 0;
+    var len = 1
+    for(let i = 1; i < nums.length; i++) {
+        if(nums[i] !== nums[i - 1]) { // 后一项不等于前一项
+            nums[len++] = nums[i] // 拷贝数组元素
+        }
+    }
+    return len
+};
+```
+
+结果：
+
+- 161/161 cases passed (68 ms)
+- Your runtime beats 99.81 % of javascript submissions
+- Your memory usage beats 77.54 % of javascript submissions (36.6 MB)
+- 时间复杂度 `O(n)`
+
+**Ⅱ.删除数组元素**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var removeDuplicates = function(nums) {
+    if (nums.length === 0) return 0;
+    for(let i = 1; i < nums.length;) {
+        if(nums[i] === nums[i - 1]) { // 后一项等于前一项
+            nums.splice(i, 1)
+        } else {
+            i++
+        }
+    }
+    return nums.length
+};
+```
+
+结果：
+
+- 161/161 cases passed (96 ms)
+- Your runtime beats 75.93 % of javascript submissions
+- Your memory usage beats 30.85 % of javascript submissions (37.3 MB)
+- 时间复杂度 `O(n)`
+
+#### 查阅他人解法
+
+这里看见一种很巧妙的解法，双指针法。相当于一个用于计数，一个用于扫描。
+
+**Ⅰ.双指针法**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var removeDuplicates = function(nums) {
+    if (nums.length === 0) return 0;
+
+    let i = 0;
+    for(let j = 1; j < nums.length; j++) {
+        if (nums[j] !== nums[i]) {
+            nums[++i] = nums[j]
+        }
+    }
+    return i + 1  // 下标 +1 为数组长度
+};
+```
+
+结果：
+
+- 161/161 cases passed (68 ms)
+- Your runtime beats 99.81 % of javascript submissions
+- Your memory usage beats 84.03 % of javascript submissions (36.5 MB)
+- 时间复杂度 `O(n)`
+
+#### 思考总结
+
+就三种解法而言，删除数组元素会频繁修改数组，不建议使用。双指针法和拷贝数组元素代码逻辑相似，但是思路上是截然不同的。
