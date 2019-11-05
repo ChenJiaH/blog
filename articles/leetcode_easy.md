@@ -18,6 +18,7 @@
 - [21.合并两个有序链表](#20合并两个有序链表)
 - [26.删除排序数组中的重复项](#26删除排序数组中的重复项)
 - [27.移除元素](#27移除元素)
+- [28.实现strStr](#28实现strStr)
 
 ## Easy
 
@@ -1475,3 +1476,519 @@ var removeElement = function(nums, val) {
 #### 思考总结
 
 这里开拓下思路：如果要移除的是多项，那么还是使用指针法做处理合适；如果是移除单项，那么使用交互移除法其实遍历次数最少。
+
+
+### 28.实现strStr
+
+[题目地址](https://leetcode-cn.com/problems/implement-strstr/)
+
+#### 题目描述
+
+实现 `strStr()` 函数。
+
+给定一个 `haystack` 字符串和一个 `needle` 字符串，在 `haystack` 字符串中找出 `needle` 字符串出现的第一个位置 (从0开始)。如果不存在，则返回 `-1`。
+
+示例：
+
+```javascript
+输入: haystack = "hello", needle = "ll"
+输出: 2
+
+输入: haystack = "aaaaa", needle = "bba"
+输出: -1
+```
+
+说明:
+
+当 `needle` 是空字符串时，我们应当返回什么值呢？这是一个在面试中很好的问题。
+
+对于本题而言，当 `needle` 是空字符串时我们应当返回 `0` 。这与 `C` 语言的 `strstr()` 以及 `Java` 的 `indexOf()` 定义相符。
+
+#### 题目分析设想
+
+这道题很明显是一道字符串搜索的题目，估计是在考察算法，但是受限知识面，所以我就先以现有方式实现作答，再来学习算法了。
+
+- `IndexOf` 这个是原生方法，考察这个就没有意义了，所以不做详细论述
+- 遍历匹配，相当于自己实现一个 `IndexOf`
+
+#### 编写代码验证
+
+**Ⅰ.遍历匹配**
+
+代码：
+
+```javascript
+/**
+ * @param {string} haystack
+ * @param {string} needle
+ * @return {number}
+ */
+var strStr = function(haystack, needle) {
+    if (needle === '') return 0
+    if (needle.length > haystack.length) return -1
+    if (needle.length === haystack.length && needle !== haystack) return -1
+    for(let i = 0; i < haystack.length; i++) {
+        if (i + needle.length > haystack.length) {
+            return -1
+        } else {
+            const str = haystack.substr(i, needle.length)
+            if (str === needle) {
+                return i
+            }
+        }
+    }
+    return -1
+};
+```
+
+结果：
+
+- 74/74 cases passed (64 ms)
+- Your runtime beats 90.58 % of javascript submissions
+- Your memory usage beats 44.22 % of javascript submissions (33.9 MB)
+- 时间复杂度 `O(n)`
+
+#### 查阅他人解法
+
+首先查阅《算法导论》，看到字符串匹配有以下四种：
+
+- 朴素字符串匹配算法
+- Rabin-Karp 算法
+- 利用有限自动机进行字符串匹配
+- KMP 算法
+
+然后再看题解，大概还找到以下三种算法：
+
+- BM 算法
+- Horspool 算法
+- Sunday 算法
+
+**Ⅰ.朴素字符串匹配算法**
+
+算法说明：
+
+通过一个循环找到所有有效便宜，该循环对 `n-m+1` 个可能的 `s` 值进行检测，看能否满足条件 `P[1..m] = T[s+1...s+m]`。其中 `n` 是字符串长度， 'm' 是匹配字符串长度。
+
+代码：
+
+```javascript
+/**
+ * @param {string} haystack
+ * @param {string} needle
+ * @return {number}
+ */
+var strStr = function(haystack, needle) {
+    if (needle === '') return 0
+    if (needle.length > haystack.length) return -1
+    if (needle.length === haystack.length && needle !== haystack) return -1
+
+    let i = 0;
+    let j = 0;
+    while(j < needle.length && i < haystack.length) {
+        if(haystack[i] === needle[j]) { // 同位相等，继续判断下一位
+            i++;
+            j++;
+        } else {
+            i = i - j + 1; // i 偏移
+            j = 0; // j 重置
+
+            if (i + needle.length > haystack.length) { // 我增加的优化点，减少一些运算
+                return -1
+            }
+        }
+    }
+    if (j >= needle.length) { // 子串比完了，此时 j 应该等于 needle.length
+        return i - needle.length;
+    } else {
+        return -1
+    }
+};
+```
+
+结果：
+
+- 74/74 cases passed (56 ms)
+- Your runtime beats 98.45 % of javascript submissions
+- Your memory usage beats 30.12 % of javascript submissions (34.8 MB)
+- 时间复杂度 `O(m*n)`
+
+**Ⅱ.Rabin-Karp 算法**
+
+算法说明：
+
+进行哈希运算，将字符串转成对应的哈希值进行比对，类似16进制。这里题目是字符串，我就用 `ASCII` 值来表示每个字符的哈希值，那么就可以计算出模式串的哈希值，再进行滚动比较。
+
+每次滚动只需要做固定的 `-*+` 三个操作，即可得出滚动串的哈希值了。
+
+比如计算 `bbc` ,哈希值为 `hash = (b.charCodeAt() * 128 ^ 2 + b.charCodeAt() * 128 + c.charCodeAt())`，如果要计算后新值 `bca` 则为 `(hash - b.charCodeAt() * 128 ^ 2) * 128 + c.charCodeAt()`。
+
+代码：
+
+```javascript
+/**
+ * @param {string} haystack
+ * @param {string} needle
+ * @return {number}
+ */
+var strStr = function(haystack, needle) {
+    if (needle === '') return 0
+    if (needle.length > haystack.length) return -1
+    if (needle.length === haystack.length && needle !== haystack) return -1
+
+    let searchHash = 0 // 搜索字符串的hash值
+    let startHash = 0 // 字符串起始的hash值
+
+    for(let i = 0; i < needle.length; i++) {
+        searchHash += needle.charCodeAt(i) * Math.pow(2, needle.length - i - 1)
+        startHash += haystack.charCodeAt(i) * Math.pow(2, needle.length - i - 1)
+    }
+
+    if (startHash === searchHash)  return 0
+
+    for(let j = 1; j < haystack.length - needle.length + 1; j++) {
+        startHash = (startHash - haystack.charCodeAt(j - 1) * Math.pow(2, needle.length - 1)) * 2 + haystack.charCodeAt(j + needle.length - 1)
+        if (startHash === searchHash) {
+            return j
+        }
+    }
+    return -1
+};
+```
+
+结果：
+
+- 74/74 cases passed (68 ms)
+- Your runtime beats 81.31 % of javascript submissions
+- Your memory usage beats 16.86 % of javascript submissions (35.4 MB)
+- 时间复杂度 `O(m*n)`
+
+
+
+> 注意：这里可能会存在溢出的情况，所以不是所有情况都适用。
+
+**Ⅲ.利用有限自动机进行字符串匹配**
+
+算法说明：
+
+通过对文本字符串 `T` 进行扫描，找出模式 `P` 的所有出现位置。它们只对每个文本字符检查一次，并且检查每个文本字符时所用的时间为常数。一句话概括：字符输入引起状态机状态变更，通过状态转换图得到预期结果。
+
+这里主要的核心点是判断每次输入，找到最长的后缀匹配，如果最长时的长度等于查找字符串长度，那就一定包含该查找字符串。
+
+代码：
+
+```javascript
+/**
+ * @param {string} haystack
+ * @param {string} needle
+ * @return {number}
+ */
+var strStr = function(haystack, needle) {
+    if (needle === '') return 0
+    if (needle.length > haystack.length) return -1
+    if (needle.length === haystack.length && needle !== haystack) return -1
+
+    // 查找最大匹配后缀长度
+    function findSuffix (Pq) {
+        let suffixLen = 0
+        let k = 0
+        while(k < Pq.length && k < needle.length) {
+            let i = 0;
+            for(i = 0; i <= k; i++) {
+                // 找needle中的多少项为当前状态对应字符串的匹配项
+                if (Pq.charAt(Pq.length - 1 - k + i) !== needle.charAt(i)) {
+                    break;
+                }
+            }
+
+            // 所有项都匹配，即找到了后缀
+            if (i - 1 == k) {
+                suffixLen = k+1;
+             }
+            k++
+        }
+        return suffixLen
+    }
+
+    // 获取所有输入的字符集，比如 'abbc' 和 'cd' 合集为 ['a','b','c','d']
+    const setArr = Array.from(new Set(haystack + needle)) // 用户输入的可选项
+
+    // 建立状态机
+    const hash = {}
+    for(let q = 0; q < haystack.length; q++) {
+        for(let k = 0; k < setArr.length; k++) {
+            const char = haystack.substring(0, q) + setArr[k] // 下个状态的字符
+            const nextState = findSuffix(char)
+            // 求例如 0.a 0.b 0.c 的值
+            if (!hash[q]) {
+                hash[q] = {}
+            }
+            hash[q][char] = nextState
+        }
+    }
+
+    // 根据状态机求解
+    let matchStr = ''
+    for(let n = 0; n < haystack.length; n++) {
+        const map = hash[n]
+        matchStr += haystack[n]
+        const nextState = map[matchStr]
+
+        if (nextState === needle.length) {
+            return n - nextState + 1
+        }
+    }
+    return -1
+};
+```
+
+结果：
+
+- 74/74 cases passed (84 ms)
+- Your runtime beats 35.05 % of javascript submissions
+- Your memory usage beats 5.05 % of javascript submissions (39.8 MB)
+- 时间复杂度 `O(n)`
+
+
+**Ⅳ.KMP 算法**
+
+算法说明：
+
+可以理解为在状态机的基础上，使用了一个前缀函数来进行状态判断。本质上也是前缀后缀的思想。
+
+代码：
+
+```javascript
+// @lc code=start
+/**
+ * @param {string} haystack
+ * @param {string} needle
+ * @return {number}
+ */
+var strStr = function(haystack, needle) {
+    if (needle === '') return 0
+    if (needle.length > haystack.length) return -1
+    if (needle.length === haystack.length && needle !== haystack) return -1
+
+    // 生成匹配串各个位置下下的最长公共前后缀长度哈希表
+    function getHash () {
+        let i = 0 // arr[i] 表示 i 前面的字符串的最长公共前后缀长度
+        let j = 1
+        let hash = {
+            0: 0
+        }
+        while (j < needle.length) {
+            if (needle.charAt(i) === needle.charAt(j)) { // 相等直接 i j 都后移
+                hash[j++] = ++i
+            } else if (i === 0) {   // i 为起点且两者不相等，那么一定为0
+                hash[j] = 0
+                j++
+            } else {
+                // 这里解释一下： 因为i前面的字符串与j前面的字符串拥有相同的最长公共前后缀，也就是说i前面字符串的最长公共后缀与j前面字符串的最长公共前缀相同，所以i只需回到i前面字符串最长公共前缀的后一位开始比较
+                i = hash[i - 1]
+            }
+        }
+        return hash
+    }
+
+    const hash = getHash()
+    let i = 0 // 母串中的位置
+    let j = 0 // 子串中的位置
+    while(i < haystack.length && j < needle.length) {
+        if (haystack.charAt(i) === needle.charAt(j)) {  // 两个匹配，同时后移
+            i++
+            j++
+        } else if (j === 0) { // 两个不匹配，并且j在起点，则母串后移
+            i++
+        } else {
+            j = hash[j - 1]
+        }
+    }
+    if (j === needle.length) {  // 循环完了，说明匹配到了
+        return i - j
+    } else {
+        return -1
+    }
+};
+```
+
+结果：
+
+- 74/74 cases passed (60 ms)
+- Your runtime beats 94.74 % of javascript submissions
+- Your memory usage beats 23.73 % of javascript submissions (35.1 MB)
+- 时间复杂度 `O(n)`
+
+**Ⅴ.BM 算法**
+
+算法说明：
+
+基于后缀匹配，匹配从后开始，但移动还是从前开始，只是定义了两个规则：坏字符规则和好后缀规则。
+
+通俗来讲就是先验证是否为坏字符，然后判断是否在搜索词中进行对应的偏移进行下一步验证。如果匹配的话就从后往前校验，如果仍然匹配，就为好后缀。核心思想是每次位移都在坏字符和好后缀规则中取较大值，由于两个规则都只与匹配项相关，所以可以提前生成规则表。
+
+代码：
+
+```javascript
+/**
+ * @param {string} haystack
+ * @param {string} needle
+ * @return {number}
+ */
+var strStr = function(haystack, needle) {
+    if (needle === '') return 0
+    if (needle.length > haystack.length) return -1
+    if (needle.length === haystack.length && needle !== haystack) return -1
+
+    function makeBadChar (needle) {
+        let hash = {}
+        for(let i = 0; i < 256; i++) { // ascii 字符长度
+            hash[String.fromCharCode(i)] = -1 // 初始化为-1
+        }
+        for(let i = 0; i < needle.length; i++) {
+            hash[needle.charAt(i)] = i  // 最后出现该字符的位置
+        }
+        return hash
+    }
+
+    function makeGoodSuffix (needle) {
+        let hashSuffix = {}
+        let hashPrefix = {}
+        for(let i = 0; i < needle.length; i++) {
+            hashSuffix[i] = -1
+            hashPrefix[i] = false
+        }
+        for(let i = 0; i < needle.length - 1; i++) { // needle[0, i]
+            let j = i
+            k = 0 // 公共后缀子串长度，尾部取k个出来进行比较
+            while(j >= 0 && needle.charAt(j) === needle.charAt(needle.length - 1 - k)) { // needle[0,needle.length - 1]
+                --j
+                ++k
+                hashSuffix[k] = j + 1 // 起始下标
+            }
+
+            if (j === -1) { // 说明全部匹配，意味着此时公共后缀子串也是模式的前缀子串
+                hashPrefix[k] = true
+            }
+        }
+        return { hashSuffix, hashPrefix }
+    }
+
+    function moveGoodSuffix (j, needle) {
+        let k = needle.length - 1 - j
+        let suffixes = makeGoodSuffix(needle).hashSuffix
+        let prefixes = makeGoodSuffix(needle).hashPrefix
+        if (suffixes[k] !== -1) { // 找到了跟好后缀一样的子串，获取下标
+            return j - suffixes[k] + 1
+        }
+        for(let r = j + 2; r < needle.length; ++r) {
+            if (prefixes[needle.length - r]) { // needle.length 是好后缀子串长度
+                return r // 对齐前缀到好后缀
+            }
+        }
+        return needle.length // 全部匹配，直接移动字符串长度
+    }
+
+    let badchar = makeBadChar(needle)
+    let i = 0;
+    while(i < haystack.length - needle.length + 1) {
+        let j
+        for(j = needle.length - 1; j >= 0; --j) {
+            if (haystack.charAt(i + j) != needle[j]) {
+                break; // 坏字符，下标为j
+            }
+        }
+        if (j < 0) { // 匹配成功
+            return i // 第一个匹配字符的位置
+        }
+        let moveLen1 = j - badchar[haystack.charAt(i + j)]
+        let moveLen2 = 0
+        if (j < needle.length -1) { // 如果有好后缀
+            moveLen2 = moveGoodSuffix(j, needle)
+        }
+        i = i + Math.max(moveLen1, moveLen2)
+    }
+
+    return -1
+};
+```
+
+结果：
+
+- 74/74 cases passed (72 ms)
+- Your runtime beats 69.29 % of javascript submissions
+- Your memory usage beats 5.05 % of javascript submissions (37 MB)
+- 时间复杂度 `O(n)`
+
+**Ⅵ.Horspool 算法**
+
+算法说明：
+
+将主串中匹配窗口的最后一个字符跟模式串中的最后一个字符比较。如果相等，继续从后向前对主串和模式串进行比较，直到完全相等或者在某个字符处不匹配为止。如果不匹配，则根据主串匹配窗口中的最后一个字符在模式串中的下一个出现位置将窗口向右移动。
+
+代码：
+
+```javascript
+/**
+ * @param {string} haystack
+ * @param {string} needle
+ * @return {number}
+ */
+var strStr = function(haystack, needle) {
+    if (needle === '') return 0
+    if (needle.length > haystack.length) return -1
+    if (needle.length === haystack.length && needle !== haystack) return -1
+
+    let hash = {}
+    for(let i = 0; i < 256; i++) {
+        hash[i] = needle.length // 默认初始化为最大偏移量，也就是匹配串长度
+    }
+    for(let i = 0; i < needle.length - 1; i++) {
+        hash[needle.charCodeAt(i)] = needle.length - 1 - i // 每个字符距离右侧的距离
+    }
+
+    let pos = 0
+
+    while(pos < (haystack.length - needle.length + 1)) {
+        let j = needle.length - 1 // 从右往左
+        while(j >= 0 && haystack.charAt(pos + j) === needle.charAt(j)) {
+            j--
+        }
+        if (j < 0) { // 全部匹配
+            return pos
+        } else { // 不匹配
+            pos += hash[haystack.charCodeAt(pos + needle.length - 1)]
+        }
+    }
+
+    return -1
+};
+```
+
+结果：
+
+- 74/74 cases passed (68 ms)
+- Your runtime beats 79.76 % of javascript submissions
+- Your memory usage beats 16.14 % of javascript submissions (35.4 MB)
+- 时间复杂度 `O(n)`
+
+**Ⅶ.Sunday 算法**
+
+算法说明：
+
+它的思想跟 `BM 算法` 相似，但是它是从前往后匹配，匹配失败时关注主串内参与匹配的后一位字符。如果该字符不存在匹配字符中，则多偏移一位；如果存在，则偏移匹配串长度减该字符最右出现的位置。
+
+代码：
+
+```javascript
+```
+
+结果：
+
+- 74/74 cases passed (56 ms)
+- Your runtime beats 98.3 % of javascript submissions
+- Your memory usage beats 74.1 % of javascript submissions (33.6 MB)
+- 时间复杂度 `O(n)`
+
+#### 思考总结
+
+就理解的难易度来讲，我建议先看 `Sunday 算法` 和 `Horspool 算法`，不过 `RMP 算法` 的匹配思路打开了眼界，利用后缀前缀来处理问题。这里把常见的字符串算法都做了一次尝试，整体下来收获颇丰。
