@@ -1980,6 +1980,40 @@ var strStr = function(haystack, needle) {
 代码：
 
 ```javascript
+/**
+ * @param {string} haystack
+ * @param {string} needle
+ * @return {number}
+ */
+var strStr = function(haystack, needle) {
+    if (needle === '') return 0
+    if (needle.length > haystack.length) return -1
+    if (needle.length === haystack.length && needle !== haystack) return -1
+
+    let hash = {}
+    for(let i = 0; i < needle.length; i++) {
+        hash[needle.charAt(i)] = needle.length - i // 偏移表
+    }
+
+    for(let i = 0; i < haystack.length;) {
+        let j
+        for(j = 0; j < needle.length; j++) {
+            if (haystack.charAt(i + j) !== needle.charAt(j)) {
+                break
+            }
+        }
+        if(j === needle.length) { // 完全匹配
+            return i
+        }
+        if (i + needle.length >= haystack.length) { // 未找到
+            return -1
+        } else {
+            i += hash[haystack.charAt(i + needle.length)] || needle.length + 1
+        }
+    }
+
+    return -1
+};
 ```
 
 结果：
