@@ -19,6 +19,7 @@
 - [26.删除排序数组中的重复项](#26删除排序数组中的重复项)
 - [27.移除元素](#27移除元素)
 - [28.实现strStr](#28实现strStr)
+- [35.搜索插入位置](#35搜索插入位置)
 
 ## Easy
 
@@ -2026,3 +2027,109 @@ var strStr = function(haystack, needle) {
 #### 思考总结
 
 就理解的难易度来讲，我建议先看 `Sunday 算法` 和 `Horspool 算法`，不过 `RMP 算法` 的匹配思路打开了眼界，利用后缀前缀来处理问题。这里把常见的字符串算法都做了一次尝试，整体下来收获颇丰。
+
+### 35.搜索插入位置
+
+[题目地址](https://leetcode-cn.com/problems/search-insert-position/)
+
+#### 题目描述
+
+给定一个排序数组和一个目标值，在数组中找到目标值，并返回其索引。如果目标值不存在于数组中，返回它将会被按顺序插入的位置。
+
+你可以假设数组中无重复元素。
+
+示例：
+
+```javascript
+输入: [1,3,5,6], 5
+输出: 2
+
+输入: [1,3,5,6], 2
+输出: 1
+
+输入: [1,3,5,6], 7
+输出: 4
+
+输入: [1,3,5,6], 0
+输出: 0
+```
+
+#### 题目分析设想
+
+这道题目有点明显，题干说明了是排序数组，重点是排序数组，所以很明显的第一反应会使用二分法来解题。同时可以注意一下，数组中无重复元素。所以这道题我就按两个方案来作答：
+
+- 暴力法，直接遍历
+- 二分法，可以理解成不断折半排除不可能
+
+#### 编写代码验证
+
+**Ⅰ.暴力法**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @param {number} target
+ * @return {number}
+ */
+var searchInsert = function(nums, target) {
+    if (nums.length === 0 || nums[0] > target) return 0;
+    if(nums[nums.length - 1] < target) return nums.length;
+
+    for(let i = 0; i < nums.length; i++) {
+        if(nums[i] >= target) return i
+    }
+};
+```
+
+结果：
+
+- 62/62 cases passed (60 ms)
+- Your runtime beats 92.48 % of javascript submissions
+- Your memory usage beats 63.22 % of javascript submissions (33.8 MB)
+- 时间复杂度 `O(n)`
+
+**Ⅱ.二分法**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @param {number} target
+ * @return {number}
+ */
+var searchInsert = function(nums, target) {
+    if (nums.length === 0 || nums[0] > target) return 0;
+    if(nums[nums.length - 1] < target) return nums.length;
+
+    let left = 0; // 起点
+    let right = nums.length - 1; // 终点
+    while(left < right) {
+         // 零填充右位移，使用位运算避免溢出，大部分情况下等于 (left + right / 2)
+        let i = parseInt((left + right) >>> 1) // 这里选择取左
+        if (nums[i] < target) { // 中位数小于目标值
+            left = i + 1 // 排除中位数左侧
+        } else {
+            right = i // 排除中位数右侧
+        }
+    }
+    return left
+};
+```
+
+结果：
+
+- 62/62 cases passed (52 ms)
+- Your runtime beats 99.31 % of javascript submissions
+- Your memory usage beats 61.31 % of javascript submissions (33.8 MB)
+- 时间复杂度 `O(log2(n))`
+
+#### 查阅他人解法
+
+基本上这道题就是针对二分法进行考察的，所以没有看到其他特别的解法。
+
+#### 思考总结
+
+看见排序数组，查找下标，那么就可以果断选择二分法啦。
