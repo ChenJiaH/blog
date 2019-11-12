@@ -4,7 +4,7 @@
       <p>与大多数的订阅不同，您需要安装 <strong>Chrome插件</strong> 来获取最新文章推送。</p>
       <div class="action-box flex flex-middle">
         <a href="https://github.com/ChenJiaH/blog-extension" target="_blank" rel="noopener noreferrer">下载地址</a>
-        <a href="https://chenjiahao.xyz/blog/#/archives/40" target="_blank" rel="noopener noreferrer">帮助文档</a>
+        <a href="https://chenjiahao.xyz/blog/#/archives/40" rel="noopener noreferrer">帮助文档</a>
       </div>
     </div>
   </div>
