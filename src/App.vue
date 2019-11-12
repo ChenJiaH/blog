@@ -95,6 +95,9 @@ export default {
     }, {
       path: '/search',
       name: '搜索',
+    }, {
+      path: '/subscribe',
+      name: '订阅',
     }];
 
     const global = reactive({
@@ -386,7 +389,7 @@ export default {
           margin-left: 6px;
         }
 
-        @for $i from 1 through 6 {
+        @for $i from 1 through 7 {
           .nav-item:nth-child(#{$i}) {
             display: none;
             animation: fadeIn 0.8s #{0.1 * ($i - 1)}s both;
@@ -467,7 +470,7 @@ export default {
       left: 0;
       bottom: 0;
       width: 100%;
-      height: 160px;
+      padding-bottom: 10px;
       transition: all 0.3s ease-out;
       background-color: #fefefe;
 
@@ -501,8 +504,9 @@ export default {
       }
 
       .navs {
-        height: 70px;
-
+        min-height: 70px;
+        flex-wrap: wrap;
+        margin-top: 8px;
         .nav-item {
           width: 40px;
           height: 40px;
@@ -510,7 +514,7 @@ export default {
           background-color: #f0f0f0;
           transition: all 0.5s;
           color: #555555;
-
+          margin: 8px 4px;
           i {
             font-size: 22px;
             color: #999999;
@@ -518,10 +522,6 @@ export default {
           &:active {
             background-color: #dfdfdf;
           }
-        }
-
-        .nav-item + .nav-item {
-          margin-left: 8px;
         }
       }
     }
