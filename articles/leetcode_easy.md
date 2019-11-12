@@ -21,6 +21,7 @@
 - [28.实现strStr](#28实现strStr)
 - [35.搜索插入位置](#35搜索插入位置)
 - [38.报数](#38报数)
+- [53.最大子序和](#53最大子序和)
 
 ## Easy
 
@@ -2352,3 +2353,263 @@ var countAndSay = function(n) {
 #### 思考总结
 
 总体而言，这道题用正则去解答十分简单，考验的点在正则的匹配这块；当然递归或者遍历也是常规思路；字典法纯属一乐。推荐使用正则来解答此题。
+
+### 53.最大子序和
+
+[题目地址](https://leetcode-cn.com/problems/maximum-subarray/)
+
+#### 题目描述
+
+给定一个整数数组 `nums` ，找到一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。
+
+示例:
+
+```javascript
+输入: [-2,1,-3,4,-1,2,1,-5,4],
+输出: 6
+解释: 连续子数组 [4,-1,2,1] 的和最大，为 6。
+```
+
+进阶:
+
+如果你已经实现复杂度为 O(n) 的解法，尝试使用更为精妙的分治法求解。
+
+#### 题目分析设想
+
+这道题首先基本解法肯定是暴力的遍历求解，直接遍历找出最大区间。当然这里我们也可以使用动态规划来思考问题，列出动态和转移方程式，等于求解 `Max(d[0, i])`。另外进阶里面提示分治法，分治法在之前有用过，我们也可以做为一个方向。所以大概有三种：
+
+- 遍历求解，直接遍历算出各区间值
+- 动态规划问题，求解动态问题，找到每个动态区间的最大值
+- 分治，不断二分找区间内的最大子序和
+
+注意一下，只要是寻找最大值最小值的，初始值需要定义为理论上的最大最小值。
+
+#### 编写代码验证
+
+**Ⅰ.遍历求解**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var maxSubArray = function(nums) {
+    let res = Number.MIN_SAFE_INTEGER
+    for(let i = 0; i < nums.length; i++) {
+        let sum = 0
+        // 分别算出 i 开始的最大子序和
+        for(let j = i; j < nums.length; j++) {
+            sum += nums[j];
+            res = Math.max(res, sum)
+        }
+    }
+    return res
+};
+```
+
+结果：
+
+- 202/202 cases passed (272 ms)
+- Your runtime beats 7.61 % of javascript submissions
+- Your memory usage beats 41.88 % of javascript submissions (35.1 MB)
+- 时间复杂度 `O(n^2)`
+
+**Ⅱ.动态规划**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var maxSubArray = function(nums) {
+    let res = dp = nums[0] // 初始值
+    for(let i = 1; i < nums.length; i++) {
+        dp = Math.max(dp + nums[i], nums[i]) // 动态取得最大值
+        res = Math.max(res, dp)
+    }
+    return res
+};
+```
+
+结果：
+
+- 202/202 cases passed (68 ms)
+- Your runtime beats 90.14 % of javascript submissions
+- Your memory usage beats 45 % of javascript submissions (35.1 MB)
+- 时间复杂度 `O(n)`
+
+**Ⅲ.分治**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var maxSubArray = function(nums) {
+    // 不断分治
+    function countByDichotomy (start, end) {
+        // 存储左侧结果，右侧结果，两者更大值，以及两者相加的值
+        // 解释一下：最大子序列在左右两区间内要么过界要么不过界。
+        // 如果不过界，则最大值为 Max(left, right)
+        // 如果过界，则最大为左区间到中间的最大值加中间到右区间的最大值
+        if (end === start) { // 数组就一项
+            return {
+                lmax: nums[start], // 左半区间包含其右端点的最大子序和
+                rmax: nums[start], // 右半区间包含其左端点的最大子序和
+                sum: nums[start], // 总和
+                result: nums[start] // 区域内部的最大子序和
+            }
+        } else {
+            const mid = (start + end) >>> 1 // 这个取中位数写法之前解释过，避免溢出
+            const left = countByDichotomy(start, mid) // 左区间中计算结果
+            const right = countByDichotomy(mid + 1, end) // 右区间中计算结果
+            return {
+                lmax: Math.max(left.lmax, left.sum + right.lmax),
+                rmax: Math.max(right.rmax, left.rmax + right.sum),
+                sum: left.sum + right.sum,
+                result: Math.max(left.rmax + right.lmax, Math.max(left.result, right.result))
+            }
+        }
+    }
+    return countByDichotomy(0, nums.length - 1).result;
+};
+```
+
+结果：
+
+- 202/202 cases passed (60 ms)
+- Your runtime beats 97.89 % of javascript submissions
+- Your memory usage beats 5.01 % of javascript submissions (36.7 MB)
+- 时间复杂度 `O(n)`
+
+#### 查阅他人解法
+
+查阅题解的过程中发现了以下几种有意思的思路：
+
+- 动态规划，使用增益的思路。其实上面我们写的动态规划是一样的
+- 贪心法，尝试多加一位，取较大值
+- 分治中使用贪心法求区间
+
+**Ⅰ.动态规划**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var maxSubArray = function(nums) {
+    let res = nums[0]
+    let sum = nums[0] // 增益
+    for(let i = 1; i < nums.length; i++) {
+        if (sum > 0) { // 正向增益， sum 保留并加上当前遍历数字
+            sum += nums[i]
+        } else { // sum 更新为当前遍历数字
+            sum = nums[i]
+        }
+        res = Math.max(res, sum)
+    }
+    return res
+};
+```
+
+结果：
+
+- 202/202 cases passed (60 ms)
+- Your runtime beats 97.89 % of javascript submissions
+- Your memory usage beats 47.5 % of javascript submissions (35.1 MB)
+- 时间复杂度 `O(n)`
+
+**Ⅱ.贪心法**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var maxSubArray = function(nums) {
+    let res = Number.MIN_SAFE_INTEGER // 初始值
+    let sum = 0
+    for(let i = 0; i < nums.length; i++) {
+        sum += nums[i]
+        res = Math.max(res, sum)
+        if (sum < 0) { // 重新开始找子序串
+            sum = 0;
+        }
+    }
+    return res
+};
+```
+
+结果：
+
+- 202/202 cases passed (68 ms)
+- Your runtime beats 90.14 % of javascript submissions
+- Your memory usage beats 45 % of javascript submissions (35.1 MB)
+- 时间复杂度 `O(n)`
+
+**Ⅲ.分治中使用贪心法求区间**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var maxSubArray = function(nums) {
+    // 获取跨边界的和
+    function getMaxCross (start, mid, end) {
+        let leftRes = Number.MIN_SAFE_INTEGER
+        let leftSum = 0
+        for(let i = mid; i >= start; i--) {
+            leftSum += nums[i]
+            leftRes = Math.max(leftRes, leftSum)
+        }
+
+        let rightRes = Number.MIN_SAFE_INTEGER
+        let rightSum = 0
+        for(let i = mid + 1; i <= end; i++) {
+            rightSum += nums[i]
+            rightRes = Math.max(rightRes, rightSum)
+        }
+
+        return leftRes + rightRes
+    }
+
+    function countByDichotomy (start, end) {
+        if (start === end) {
+            return nums[start]
+        } else {
+            const mid = (start + end) >>> 1
+            const leftSum = countByDichotomy(start, mid)
+            const rightSum = countByDichotomy(mid + 1, end)
+            const midSum = getMaxCross(start, mid, end)
+            // 三者比较最大的就为最大子序和
+            return Math.max(leftSum, rightSum, midSum)
+        }
+    }
+
+    return countByDichotomy(0, nums.length - 1)
+};
+```
+
+结果：
+
+- 202/202 cases passed (72 ms)
+- Your runtime beats 80.56 % of javascript submissions
+- Your memory usage beats 49.38 % of javascript submissions (35.1 MB)
+- 时间复杂度 `O(nlog(n))`
+
+#### 思考总结
+
+个人认为动态规划在这套题里面解题思路清晰，贪心法也可以理解为基于遍历基础上做的延伸，而分治法需要画图加以理解。一般看到这种最大最长的题目，基本上就可以用动态规划问题来尝试作答了。
