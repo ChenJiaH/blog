@@ -22,6 +22,7 @@
 - [35.搜索插入位置](#35搜索插入位置)
 - [38.报数](#38报数)
 - [53.最大子序和](#53最大子序和)
+- [58.最后一个单词的长度](#58最后一个单词的长度)
 
 ## Easy
 
@@ -2613,3 +2614,154 @@ var maxSubArray = function(nums) {
 #### 思考总结
 
 个人认为动态规划在这套题里面解题思路清晰，贪心法也可以理解为基于遍历基础上做的延伸，而分治法需要画图加以理解。一般看到这种最大最长的题目，基本上就可以用动态规划问题来尝试作答了。
+
+### 58.最后一个单词的长度
+
+[题目地址](https://leetcode-cn.com/problems/length-of-last-word/)
+
+#### 题目描述
+
+给定一个仅包含大小写字母和空格 `' '` 的字符串，返回其最后一个单词的长度。
+
+如果不存在最后一个单词，请返回 `0` 。
+
+说明：一个单词是指由字母组成，但不包含任何空格的字符串。
+
+示例：
+
+```javascript
+输入: "Hello World"
+输出: 5
+```
+
+#### 题目分析设想
+
+这道题看上去像是一道字符串题，我们可以从以下几个方面来尝试作答：
+
+- 遍历，从末尾开始，效率高
+- lastIndexOf，直接找空格
+- 正则
+- split
+
+#### 编写代码验证
+
+**Ⅰ.遍历**
+
+代码：
+
+```
+/**
+ * @param {string} s
+ * @return {number}
+ */
+var lengthOfLastWord = function(s) {
+    if(!s.length) return 0
+    let i = s.length - 1
+    while(i >= 0 && s.charAt(i) === ' ') {
+        i--
+    }
+    if(i < 0) return 0 // 全是空格
+
+    let j = i
+    while(j >= 0 && s.charAt(j) != ' ') {
+        j--
+    }
+    return i - j
+};
+```
+
+结果：
+
+- 59/59 cases passed (64 ms)
+- Your runtime beats 81.14 % of javascript submissions
+- Your memory usage beats 29.72 % of javascript submissions (33.8 MB)
+- 时间复杂度 `O(n)`
+
+**Ⅱ.lastIndexOf**
+
+代码：
+
+```javascript
+/**
+ * @param {string} s
+ * @return {number}
+ */
+var lengthOfLastWord = function(s) {
+    if(!s.length) return 0
+    s = s.trim()
+    const idx = s.lastIndexOf(' ')
+    return idx === -1 ? s.length : s.length - 1 - idx
+};
+```
+
+结果：
+
+- 59/59 cases passed (48 ms)
+- Your runtime beats 99.48 % of javascript submissions
+- Your memory usage beats 36.52 % of javascript submissions (33.7 MB)
+- 时间复杂度 `O(1)`
+
+**Ⅲ.正则**
+
+代码：
+
+```javascript
+/**
+ * @param {string} s
+ * @return {number}
+ */
+var lengthOfLastWord = function(s) {
+    if(!s.length) return 0
+    const match = s.match(/([a-zA-Z]+)\s*$/)
+    let res = 0
+    if (match) {
+        res = match.pop()
+        return res.length
+    }
+    return res
+};
+```
+
+结果：
+
+- 59/59 cases passed (80 ms)
+- Your runtime beats 26.65 % of javascript submissions
+- Your memory usage beats 5.95 % of javascript submissions (34.2 MB)
+- 时间复杂度 `O(1)`
+
+**Ⅳ.split**
+
+代码：
+
+```javascript
+/**
+ * @param {string} s
+ * @return {number}
+ */
+var lengthOfLastWord = function(s) {
+    if(!s.length) return 0
+    s = s.trim()
+    const arr = s.split(' ')
+    if (arr.length) {
+        let str = arr.pop()
+        return str.length
+    } else {
+        return 0
+    }
+};
+```
+
+结果：
+
+- 59/59 cases passed (60 ms)
+- Your runtime beats 90.57 % of javascript submissions
+- Your memory usage beats 13.8 % of javascript submissions (34 MB)
+- 时间复杂度 `O(1)`
+
+#### 查阅他人解法
+
+没有在题解中看到什么特别的解法，大部分都是基于类库解的，比如 `Javascript` 中 `String` 和 `Array` 的方法。或者是遍历实现的。
+
+#### 思考总结
+
+直到现在也没有弄明白这道题的考察点在哪里？不过我建议感兴趣的同学，可以自己拓展实现 `lastIndexOf` ，参考 [上一期](https://github.com/ChenJiaH/blog/issues/45) 28题的数十种解法，应该能有不小收获。
