@@ -23,6 +23,7 @@
 - [38.报数](#38报数)
 - [53.最大子序和](#53最大子序和)
 - [58.最后一个单词的长度](#58最后一个单词的长度)
+- [66.加一](#66加一)
 
 ## Easy
 
@@ -2765,3 +2766,104 @@ var lengthOfLastWord = function(s) {
 #### 思考总结
 
 直到现在也没有弄明白这道题的考察点在哪里？不过我建议感兴趣的同学，可以自己拓展实现 `lastIndexOf` ，参考 [上一期](https://github.com/ChenJiaH/blog/issues/45) 28题的数十种解法，应该能有不小收获。
+
+### 66.加一
+
+[题目地址](https://leetcode-cn.com/problems/plus-one/)
+
+#### 题目描述
+
+给定一个由整数组成的非空数组所表示的非负整数，在该数的基础上加一。
+
+最高位数字存放在数组的首位， 数组中每个元素只存储单个数字。
+
+你可以假设除了整数 0 之外，这个整数不会以零开头。
+
+示例：
+
+```javascript
+输入: [1,2,3]
+输出: [1,2,4]
+解释: 输入数组表示数字 123。
+
+输入: [4,3,2,1]
+输出: [4,3,2,2]
+解释: 输入数组表示数字 4321。
+```
+
+#### 题目分析设想
+
+这道题我有两个大方向，一是数组遍历进行求解，另外一种是数组转数字再处理。但是转数字可能会溢出，所以就只想到从遍历的角度来作答。
+
+- 遍历，从后往前遍历找到不为9的项，后面填0就可以了
+
+#### 编写代码验证
+
+**Ⅰ.遍历**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} digits
+ * @return {number[]}
+ */
+var plusOne = function(digits) {
+    for(let i = digits.length - 1; i >= 0; i--) {
+        // 找不到不为9的数，直接加1输出就可以了
+        if(digits[i] !== 9) {
+            digits[i]++
+            return digits
+        } else {
+            digits[i] = 0
+        }
+    }
+    digits.unshift(1)
+    return digits
+};
+```
+
+结果：
+
+- 109/109 cases passed (60 ms)
+- Your runtime beats 93.72 % of javascript submissions
+- Your memory usage beats 26.35 % of javascript submissions (33.8 MB)
+- 时间复杂度 `O(n)`
+
+#### 查阅他人解法
+
+发现思路基本都是遍历，但是具体实现会有些差距，这里只列举一个最简单的。
+
+**Ⅰ.遍历**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} digits
+ * @return {number[]}
+ */
+var plusOne = function(digits) {
+    for(let i = digits.length - 1; i >= 0; i--) {
+        digits[i]++
+        // 取10的余数，做了赋值操作，为0就继续进位
+        digits[i] %= 10
+        if(digits[i] !== 0) {
+            return digits
+        }
+    }
+    digits.unshift(1)
+    return digits
+};
+```
+
+结果：
+
+- 109/109 cases passed (64 ms)
+- Your runtime beats 85.29 % of javascript submissions
+- Your memory usage beats 94.34 % of javascript submissions (33.4 MB)
+- 时间复杂度 `O(n)`
+
+#### 思考总结
+
+这道题可能大众的想法会转成数字再处理，但是做数字运算的时候，千万要记住考虑溢出的问题。另外因为是加1，所以倒序遍历就可以了。至于是判断末位为9还是对10取余，我觉得都是一个很好理解的思路，也避免了代码的繁琐。
