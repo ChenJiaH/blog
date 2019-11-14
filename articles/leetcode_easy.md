@@ -24,6 +24,7 @@
 - [53.最大子序和](#53最大子序和)
 - [58.最后一个单词的长度](#58最后一个单词的长度)
 - [66.加一](#66加一)
+- [67.二进制求和](#67二进制求和)
 
 ## Easy
 
@@ -2867,3 +2868,202 @@ var plusOne = function(digits) {
 #### 思考总结
 
 这道题可能大众的想法会转成数字再处理，但是做数字运算的时候，千万要记住考虑溢出的问题。另外因为是加1，所以倒序遍历就可以了。至于是判断末位为9还是对10取余，我觉得都是一个很好理解的思路，也避免了代码的繁琐。
+
+### 67.二进制求和
+
+[题目地址](https://leetcode-cn.com/problems/add-binary/)
+
+#### 题目描述
+
+给定两个二进制字符串，返回他们的和（用二进制表示）。
+
+输入为非空字符串且只包含数字 `1` 和 `0`。
+
+示例：
+
+```javascript
+输入: a = "11", b = "1"
+输出: "100"
+
+输入: a = "1010", b = "1011"
+输出: "10101"
+```
+
+#### 题目分析设想
+
+这道题又是一道加法题，所以记住下，直接转数字进行加法可能会溢出，所以不可取。所以我们需要遍历每一位来做解答。我这有两个大方向：补0后遍历，和不补0遍历。但是基本的依据都是本位相加，逢2进1即可，类似手写10进制加法。
+
+- 补0后遍历，可以采用先算出的位数推入数组最后反转，也可以采用先算出的位数填到对应位置后直接输出
+- 不补0遍历，根据短数组的长度进行遍历，长数组剩下的数字与短数组生成的进位进行计算
+
+#### 查阅他人解法
+
+**Ⅰ.补0后遍历，先算先推**
+
+代码：
+
+```javascript
+/**
+ * @param {string} a
+ * @param {string} b
+ * @return {string}
+ */
+var addBinary = function(a, b) {
+    let times = Math.max(a.length, b.length) // 需要遍历次数
+    // 补 0
+    while(a.length < times) {
+        a = '0' + a
+    }
+    while(b.length < times) {
+        b = '0' + b
+    }
+    let res = []
+    let carry = 0 // 是否进位
+    for(let i = times - 1; i >= 0; i--) {
+        const num = carry + (a.charAt(i) | 0) + (b.charAt(i) | 0)
+        carry = num >= 2 ? 1 : 0
+        res.push(num % 2)
+    }
+    if (carry === 1) {
+        res.push(1)
+    }
+    return res.reverse().join('')
+};
+```
+
+结果：
+
+- 294/294 cases passed (68 ms)
+- Your runtime beats 95.13 % of javascript submissions
+- Your memory usage beats 72.58 % of javascript submissions (35.4 MB)
+- 时间复杂度 `O(n)`
+
+**Ⅱ.补0后遍历，按位运算**
+
+代码：
+
+```javascript
+/**
+ * @param {string} a
+ * @param {string} b
+ * @return {string}
+ */
+var addBinary = function(a, b) {
+    let times = Math.max(a.length, b.length) // 需要遍历次数
+    // 补 0
+    while(a.length < times) {
+        a = '0' + a
+    }
+    while(b.length < times) {
+        b = '0' + b
+    }
+    let res = []
+    let carry = 0 // 是否进位
+    for(let i = times - 1; i >= 0; i--) {
+        res[i] = carry + (a.charAt(i) | 0) + (b.charAt(i) | 0)
+        carry = res[i] >= 2 ? 1 : 0
+        res[i] %= 2
+    }
+    if (carry === 1) {
+        res.unshift(1)
+    }
+    return res.join('')
+};
+```
+
+结果：
+
+- 294/294 cases passed (60 ms)
+- Your runtime beats 99.65 % of javascript submissions
+- Your memory usage beats 65.82 % of javascript submissions (35.5 MB)
+- 时间复杂度 `O(n)`
+
+**Ⅲ.不补0遍历**
+
+> 当然处理方式还是可以选择上面两种，我这就采用先算先推来处理了。
+
+代码：
+
+```javascript
+/**
+ * @param {string} a
+ * @param {string} b
+ * @return {string}
+ */
+var addBinary = function(a, b) {
+    let max = Math.max(a.length, b.length) // 最大长度
+    let min = Math.min(a.length, b.length) // 最大公共长度
+
+    // 将长字符串拆成两部分
+    let left = a.length > b.length ? a.substr(0, a.length - b.length) : b.substr(0, b.length - a.length)
+    let right = a.length > b.length ? a.substr(a.length - b.length) : b.substr(b.length - a.length)
+
+    // 公共长度部分遍历
+    let rightRes = []
+    let carry = 0
+    for(let i = min - 1; i >= 0; i--) {
+        const num = carry + (right.charAt(i) | 0) + (((a.length > b.length ? b : a)).charAt(i) | 0)
+        carry = num >= 2 ? 1 : 0
+        rightRes.push(num % 2)
+    }
+
+    let leftRes = []
+    for(let j = max - min - 1; j >= 0; j--) {
+        const num = carry + (left.charAt(j) | 0)
+        carry = num >= 2 ? 1 : 0
+        leftRes.push(num % 2)
+    }
+
+    if (carry === 1) {
+        leftRes.push(1)
+    }
+    return leftRes.reverse().join('') + rightRes.reverse().join('')
+};
+```
+
+结果:
+
+- 294/294 cases passed (76 ms)
+- Your runtime beats 80.74 % of javascript submissions
+- Your memory usage beats 24.48 % of javascript submissions (36.2 MB)
+- 时间复杂度 `O(n)`
+
+#### 查阅他人解法
+
+看到一些细节上的区别，我这使用 `'1' | 0` 来转数字，有的使用 `''1' - '0''`。另外还有就是初始化结果数组长度为最大长度加1后，最后判断首位是否为0需要剔除的，我这使用的是判断最后是否还要进位补1。
+
+这里还看到用一个提案中的 `BigInt` 类型来解决的
+
+**Ⅰ.BigInt**
+
+代码：
+
+```javascript
+/**
+ * @param {string} a
+ * @param {string} b
+ * @return {string}
+ */
+var addBinary = function(a, b) {
+    return (BigInt("0b"+a) + BigInt("0b"+b)).toString(2);
+};
+```
+
+结果：
+
+- 294/294 cases passed (52 ms)
+- Your runtime beats 100 % of javascript submissions
+- Your memory usage beats 97.05 % of javascript submissions (34.1 MB)
+- 时间复杂度 `O(1)`
+
+#### 思考总结
+
+通过 `BigInt` 的方案我们能看到，使用原生方法确实性能更优。简单说一下这个类型，目前还在提案阶段，看下面的等式基本就能知道实现原理自己写对应 `Hack` 来实现了：
+
+```javascript
+BigInt(10) = '10n'
+BigInt(20) = '20n'
+BigInt(10) + BigInt(20) = '30n'
+```
+
+虽然这种方式很友好，但是还是希望看到加法题的时候，能考虑到遍历按位处理。
