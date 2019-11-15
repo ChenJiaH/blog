@@ -25,6 +25,7 @@
 - [58.最后一个单词的长度](#58最后一个单词的长度)
 - [66.加一](#66加一)
 - [67.二进制求和](#67二进制求和)
+- [69.x的平方根](#69x的平方根)
 
 ## Easy
 
@@ -3067,3 +3068,180 @@ BigInt(10) + BigInt(20) = '30n'
 ```
 
 虽然这种方式很友好，但是还是希望看到加法题的时候，能考虑到遍历按位处理。
+
+### 69.x的平方根
+
+[题目地址](https://leetcode-cn.com/problems/sqrtx/)
+
+#### 题目描述
+
+实现 `int sqrt(int x)` 函数。
+
+计算并返回 x 的平方根，其中 x 是非负整数。
+
+由于返回类型是整数，结果只保留整数的部分，小数部分将被舍去。
+
+示例：
+
+```javascript
+输入: 4
+输出: 2
+
+输入: 8
+输出: 2
+说明: 8 的平方根是 2.82842...,
+     由于返回类型是整数，小数部分将被舍去。
+```
+
+#### 题目分析设想
+
+同样，这里类库提供的方法 `Math.sqrt(x)` 就不说了，这也不是本题想考察的意义。所以这里有几种方式：
+
+- 暴力法，这里不用考虑溢出是因为x没溢出，所以即使加到平方根加1，也会终止循环
+- 二分法，直接取中位数运算，可以快速排除当前区域一半的区间
+
+#### 编写代码验证
+
+**Ⅰ.暴力法**
+
+代码：
+
+```javascript
+/**
+ * @param {number} x
+ * @return {number}
+ */
+var mySqrt = function(x) {
+    if (x === 0) return 0
+    let i = 1
+    while(i * i < x) {
+        i++
+    }
+    return i * i === x ? i : i - 1
+};
+```
+
+结果：
+
+- 1017/1017 cases passed (120 ms)
+- Your runtime beats 23 % of javascript submissions
+- Your memory usage beats 34.23 % of javascript submissions (35.7 MB)
+- 时间复杂度 `O(n)`
+
+**Ⅱ.二分法**
+
+代码：
+
+```javascript
+/**
+ * @param {number} x
+ * @return {number}
+ */
+var mySqrt = function(x) {
+    if (x === 0) return 0
+    let l = 1
+    let r = x >>> 1
+    while(l < r) {
+        // 这里要用大于判断，所以取右中位数
+        const mid = (l + r + 1) >>> 1
+
+        if (mid * mid > x) {
+            r = mid - 1
+        } else {
+            l = mid
+        }
+    }
+    return l
+};
+```
+
+结果：
+
+- 1017/1017 cases passed (76 ms)
+- Your runtime beats 96.08 % of javascript submissions
+- Your memory usage beats 59.17 % of javascript submissions (35.5 MB)
+- 时间复杂度 `O(log2(n))`
+
+#### 查阅他人解法
+
+这里看见了两个有意思的解法：
+
+- 2的幂次底层优化
+- 牛顿法
+
+**Ⅰ.幂次优化**
+
+稍微解释一下，二分法需要做乘法运算，他这里改用加减法
+
+```javascript
+/**
+ * @param {number} x
+ * @return {number}
+ */
+var mySqrt = function(x) {
+    let l = 0
+    let r = 1 << 16 // 2的16次方，这里我猜是因为上限2^32所以取一半
+    while (l < r - 1) {
+        const mid = (l + r) >>> 1
+        if (mid * mid <= x) {
+            l = mid
+        } else {
+            r = mid
+        }
+    }
+    return l
+};
+```
+
+结果：
+
+1017/1017 cases passed (72 ms)
+Your runtime beats 98.46 % of javascript submissions
+Your memory usage beats 70.66 % of javascript submissions (35.4 MB)
+- 时间复杂度 `O(log2(n))`
+
+**Ⅱ.牛顿法**
+
+算法说明：
+
+在迭代过程中，以直线代替曲线，用一阶泰勒展式（即在当前点的切线）代替原曲线，求直线与 xx 轴的交点，重复这个过程直到收敛。
+
+首先随便猜一个近似值 `x`，然后不断令 `x` 等于 `x` 和 `a/x` 的平均数，迭代个六七次后 `x` 的值就已经相当精确了。
+
+公式可以写为 `X[n+1]=(X[n]+a/X[n])/2`
+
+代码：
+
+```javascript
+/**
+ * @param {number} x
+ * @return {number}
+ */
+var mySqrt = function(x) {
+    if (x === 0 || x === 1) return x
+
+    let a = x >>> 1
+    while(true) {
+        let cur = a
+        a = (a + x / a) / 2
+        // 这里是为了消除浮点运算的误差
+        if (Math.abs(a - cur) < 1e-5) {
+            return parseInt(cur)
+        }
+    }
+};
+```
+
+结果：
+
+- 1017/1017 cases passed (68 ms)
+- Your runtime beats 99.23 % of javascript submissions
+- Your memory usage beats 9.05 % of javascript submissions (36.1 MB)
+- 时间复杂度 `O(log2(n))`
+
+#### 思考总结
+
+这里就提一下新接触的牛顿法吧，实际上是牛顿迭代法，主要是迭代操作。由于在单根附近具有平方收敛，所以可以转换成线性问题去求平方根的近似值。主要应用场景有这两个方向：
+
+- 求方程的根
+- 求解最优化问题
