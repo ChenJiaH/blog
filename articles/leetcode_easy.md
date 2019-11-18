@@ -26,6 +26,7 @@
 - [66.加一](#66加一)
 - [67.二进制求和](#67二进制求和)
 - [69.x的平方根](#69x的平方根)
+- [70.爬楼梯](#70爬楼梯)
 
 ## Easy
 
@@ -3224,7 +3225,7 @@ var mySqrt = function(x) {
     while(true) {
         let cur = a
         a = (a + x / a) / 2
-        // 这里是为了消除浮点运算的误差
+        // 这里是为了消除浮点运算的误差，1e-5是我试出来的
         if (Math.abs(a - cur) < 1e-5) {
             return parseInt(cur)
         }
@@ -3245,3 +3246,222 @@ var mySqrt = function(x) {
 
 - 求方程的根
 - 求解最优化问题
+
+### 70.爬楼梯
+
+[题目地址](https://leetcode-cn.com/problems/climbing-stairs/)
+
+#### 题目描述
+
+假设你正在爬楼梯。需要 `n` 阶你才能到达楼顶。
+
+每次你可以爬 `1` 或 `2` 个台阶。你有多少种不同的方法可以爬到楼顶呢？
+
+注意：给定 `n` 是一个正整数。
+
+示例：
+
+```javascript
+输入： 2
+输出： 2
+解释： 有两种方法可以爬到楼顶。
+1.  1 阶 + 1 阶
+2.  2 阶
+
+输入： 3
+输出： 3
+解释： 有三种方法可以爬到楼顶。
+1.  1 阶 + 1 阶 + 1 阶
+2.  1 阶 + 2 阶
+3.  2 阶 + 1 阶
+```
+
+#### 题目分析设想
+
+这道题很明显可以用动态规划和斐波那契数列来求解。然后我们来看看其他正常思路，如果使用暴力法的话，那么复杂度将会是 `2^n`，很容易溢出，但是如果能够优化成 `n` 的话，其实还可以求解的。所以这道题我就从以下三个方向来作答：
+
+- 哈希递归，也就是暴力运算的改进版，通过存下算过的值降低复杂度
+- 动态规划
+- 斐波那契数列
+
+#### 编写代码验证
+
+**Ⅰ.哈希递归**
+
+代码：
+
+```javascript
+/**
+ * @param {number} n
+ * @return {number}
+ */
+var climbStairs = function(n) {
+    let hash = {}
+    return count(0)
+    function count (i) {
+        if (i > n) return 0
+        if (i === n) return 1
+
+        // 这步节省运算
+        if(hash[i] > 0) {
+            return hash[i]
+        }
+
+        hash[i] = count(i + 1) + count(i + 2)
+        return hash[i]
+    }
+};
+```
+
+结果：
+
+- 45/45 cases passed (52 ms)
+- Your runtime beats 98.67 % of javascript submissions
+- Your memory usage beats 48.29 % of javascript submissions (33.7 MB)
+- 时间复杂度 `O(n)`
+
+**Ⅱ.动态规划**
+
+代码：
+
+```javascript
+/**
+ * @param {number} n
+ * @return {number}
+ */
+var climbStairs = function(n) {
+    if (n === 1) return 1
+    if (n === 2) return 2
+    // dp[0] 多一位空间，省的后面做减法
+    let dp = new Array(n + 1).fill(0)
+    dp[1] = 1
+    dp[2] = 2
+    for(let i = 3; i <= n; i++) {
+        dp[i] = dp[i - 1] + dp[i - 2]
+    }
+    return dp[n]
+};
+```
+
+结果：
+
+- 45/45 cases passed (48 ms)
+- Your runtime beats 99.48 % of javascript submissions
+- Your memory usage beats 21.49 % of javascript submissions (33.8 MB)
+- 时间复杂度 `O(n)`
+
+**Ⅲ.斐波那契数列**
+
+其实斐波那契数列就可以用动态规划来实现，所以下面的代码思路很相似。
+
+代码：
+
+```javascript
+/**
+ * @param {number} n
+ * @return {number}
+ */
+var climbStairs = function(n) {
+    if (n === 1) return 1
+    if (n === 2) return 2
+    let num1 = 1
+    let num2 = 2
+    for(let i = 3; i <= n; i++) {
+        let count = num1 + num2
+        num1 = num2
+        num2 = count
+    }
+    // 相当于fib(n)
+    return num2
+};
+```
+
+结果：
+
+- 45/45 cases passed (56 ms)
+- Your runtime beats 95.49 % of javascript submissions
+- Your memory usage beats 46.1 % of javascript submissions (33.7 MB)
+- 时间复杂度 `O(n)`
+
+#### 查阅他人解法
+
+查看题解发现这么几种解法：
+
+- 斐波那契公式（原来有计算公式可以直接用，尴尬）
+- Binets 方法
+- 排列组合
+
+**Ⅰ.斐波那契公式**
+
+代码：
+
+```javascript
+/**
+ * @param {number} n
+ * @return {number}
+ */
+var climbStairs = function(n) {
+    const sqrt_5 = Math.sqrt(5)
+    // 由于 F0 = 1，所以相当于需要求 n+1 的值
+    const fib_n = Math.pow((1 + sqrt_5) / 2, n + 1) - Math.pow((1 - sqrt_5) / 2, n + 1)
+    return Math.round(fib_n / sqrt_5)
+};
+```
+
+结果：
+
+- 45/45 cases passed (52 ms)
+- Your runtime beats 98.67 % of javascript submissions
+- Your memory usage beats 54.98 % of javascript submissions (33.6 MB)
+- 时间复杂度 `O(log(n))`
+
+**Ⅱ.Binets 方法**
+
+算法说明：
+
+使用矩阵乘法来得到第 n 个斐波那契数。注意需要将初始项从 `fib(2)=2,fib(1)=1` 改成 `fib(2)=1,fib(1)=0` ，来达到矩阵等式的左右相等。
+
+[解法参考官方题解](https://leetcode-cn.com/problems/climbing-stairs/solution/pa-lou-ti-by-leetcode/)
+
+> 这个笔者还没完全理解，所以很抱歉，暂时没有 js 相应代码分析，后续会补上。也欢迎您补充给我，感谢！
+
+**Ⅲ.排列组合**
+
+代码：
+
+```javascript
+/**
+ * @param {number} n
+ * @return {number}
+ */
+var climbStairs = function(n) {
+    // n 个台阶走 i 次1阶和 j 次2阶走到，推导出 i + 2*j = n
+    function combine(m, n) {
+        if (m < n) [m, n] = [n, m];
+        let count = 1;
+        for (let i = m + n, j = 1; i > m; i--) {
+            count *= i;
+            if (j <= n) count /= j++;
+        }
+        return count;
+    }
+    let total = 0;
+    // 取出所有满足条件的解
+    for (let i = 0,j = n; j >= 0; j -= 2, i++) {
+      total += combine(i, j);
+    }
+    return total;
+};
+```
+
+结果：
+
+- 45/45 cases passed (60 ms)
+- Your runtime beats 87.94 % of javascript submissions
+- Your memory usage beats 20.72 % of javascript submissions (33.8 MB)
+- 时间复杂度 `O(n^2)`
+
+#### 思考总结
+
+这种叠加的问题，首先就会想到动态规划的解法，刚好这里又满足斐波那契数列，所以我是推荐首选这两种解法。另外通过查看他人解法学到了斐波那契公式，以及站在排列组合的角度去解，开拓了思路。
+
