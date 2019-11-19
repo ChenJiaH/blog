@@ -15,7 +15,7 @@
 - [13.罗马数字转整数](#13罗马数字转整数)
 - [14.最长公共前缀](#14最长公共前缀)
 - [20.有效的括号](#20有效的括号)
-- [21.合并两个有序链表](#20合并两个有序链表)
+- [21.合并两个有序链表](#21合并两个有序链表)
 - [26.删除排序数组中的重复项](#26删除排序数组中的重复项)
 - [27.移除元素](#27移除元素)
 - [28.实现strStr](#28实现strStr)
@@ -27,6 +27,7 @@
 - [67.二进制求和](#67二进制求和)
 - [69.x的平方根](#69x的平方根)
 - [70.爬楼梯](#70爬楼梯)
+- [83.删除排序链表中的重复元素](#83删除排序链表中的重复元素)
 
 ## Easy
 
@@ -3465,3 +3466,133 @@ var climbStairs = function(n) {
 
 这种叠加的问题，首先就会想到动态规划的解法，刚好这里又满足斐波那契数列，所以我是推荐首选这两种解法。另外通过查看他人解法学到了斐波那契公式，以及站在排列组合的角度去解，开拓了思路。
 
+### 83.删除排序链表中的重复元素
+
+[题目地址](https://leetcode-cn.com/problems/remove-duplicates-from-sorted-list/)
+
+#### 题目描述
+
+给定一个排序链表，删除所有重复的元素，使得每个元素只出现一次。
+
+示例：
+
+```javascript
+输入: 1->1->2
+输出: 1->2
+
+输入: 1->1->2->3->3
+输出: 1->2->3
+```
+
+#### 题目分析设想
+
+注意一下，给定的是一个排序链表，所以只需要依次更改指针就可以直接得出结果。当然，也可以使用双指针来跳过重复项即可。所以这里有两个方向：
+
+- 直接运算，通过改变指针指向
+- 双指针，通过跳过重复项
+
+如果是无序链表，我会建议先得到所有值然后去重后（比如通过Set）生成新链表作答。
+
+#### 编写代码验证
+
+**Ⅰ.直接运算**
+
+代码：
+
+```javascript
+/**
+ * @param {ListNode} head
+ * @return {ListNode}
+ */
+var deleteDuplicates = function(head) {
+    // 复制一个用做操作，由于对象是传址，所以改指针指向即可
+    let cur = head
+    while(cur !== null && cur.next !== null) {
+        if (cur.val === cur.next.val) { // 值相等
+            cur.next = cur.next.next
+        } else {
+            cur = cur.next
+        }
+    }
+    return head
+};
+```
+
+结果：
+
+- 165/165 cases passed (76 ms)
+- Your runtime beats 87.47 % of javascript submissions
+- Your memory usage beats 81.21 % of javascript submissions (35.5 MB)
+- 时间复杂度 `O(n)`
+
+**Ⅱ.双指针法**
+
+代码：
+
+```javascript
+/**
+ * @param {ListNode} head
+ * @return {ListNode}
+ */
+var deleteDuplicates = function(head) {
+    // 新建哨兵指针和当前遍历指针
+    if (head === null || head.next === null) return head
+    let pre = head
+    let cur = head
+    while(cur !== null) {
+        debugger
+        if (cur.val === pre.val) {
+            // 当前指针移动
+            cur = cur.next
+        } else {
+            pre.next = cur
+            pre = cur
+        }
+    }
+    // 最后一项如果重复需要把head.next指向null
+    pre.next = null
+    return head
+};
+```
+
+结果：
+
+- 165/165 cases passed (80 ms)
+- Your runtime beats 77.31 % of javascript submissions
+- Your memory usage beats 65.1 % of javascript submissions (35.7 MB)
+- 时间复杂度 `O(n)`
+
+#### 查阅他人解法
+
+忘记了，这里确实还可以使用递归来作答。
+
+**Ⅰ.递归法**
+
+代码：
+
+```javascript
+/**
+ * @param {ListNode} head
+ * @return {ListNode}
+ */
+var deleteDuplicates = function(head) {
+    if(head === null || head.next === null) return head
+    if (head.val === head.next.val) { // 值相等
+        return deleteDuplicates(head.next)
+    } else {
+        head.next = deleteDuplicates(head.next)
+    }
+    return head
+};
+```
+
+结果：
+
+- 165/165 cases passed (80 ms)
+- Your runtime beats 77.31 % of javascript submissions
+- Your memory usage beats 81.21 % of javascript submissions (35.5 MB)
+- 时间复杂度 `O(n)`
+
+#### 思考总结
+
+关于链表的题目一般都是通过修改指针指向来作答，区分单指针和双指针法。另外，遍历也是可以实现的。
