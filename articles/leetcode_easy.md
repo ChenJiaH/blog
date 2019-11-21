@@ -28,6 +28,7 @@
 - [69.x的平方根](#69x的平方根)
 - [70.爬楼梯](#70爬楼梯)
 - [83.删除排序链表中的重复元素](#83删除排序链表中的重复元素)
+- [88.合并两个有序数组](#88合并两个有序数组)
 
 ## Easy
 
@@ -3596,3 +3597,191 @@ var deleteDuplicates = function(head) {
 #### 思考总结
 
 关于链表的题目一般都是通过修改指针指向来作答，区分单指针和双指针法。另外，遍历也是可以实现的。
+
+### 88.合并两个有序数组
+
+[题目地址](https://leetcode-cn.com/problems/merge-sorted-array/)
+
+#### 题目描述
+
+给定两个有序整数数组 `nums1` 和 `nums2`，将 `nums2` 合并到 `nums1` 中，使得 `num1` 成为一个有序数组。
+
+说明:
+
+- 初始化 `nums1` 和 `nums2` 的元素数量分别为 `m` 和 `n`。
+- 你可以假设 `nums1` 有足够的空间（空间大小大于或等于 `m + n`）来保存 `nums2` 中的元素。
+
+示例：
+
+```javascript
+输入:
+nums1 = [1,2,3,0,0,0], m = 3
+nums2 = [2,5,6],       n = 3
+
+输出: [1,2,2,3,5,6]
+```
+
+#### 题目分析设想
+
+之前我们做过删除排序数组中的重复项，其实这里也类似。可以从这几个方向作答：
+
+- 数组合并后排序
+- 遍历数组并进行插入
+- 双指针法，轮流比较
+
+但是由于题目有限定空间都在 `nums1` ，并且不要写 `return` ，直接在 `nums1` 上修改，所以我这里主要的思路就是遍历，通过 `splice` 来修改数组。区别就在于遍历的方式方法。
+
+- 从前往后
+- 从后往前
+- 合并后排序再赋值
+
+#### 编写代码验证
+
+**Ⅰ.从前往后**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} nums1
+ * @param {number} m
+ * @param {number[]} nums2
+ * @param {number} n
+ * @return {void} Do not return anything, modify nums1 in-place instead.
+ */
+var merge = function(nums1, m, nums2, n) {
+    // 两个数组对应指针
+    let p1 = 0
+    let p2 = 0
+    // 这里需要提前把nums1的元素拷贝出来，要不然比较赋值后就丢失了
+    let cpArr = nums1.splice(0, m)
+
+    // 数组指针
+    let p = 0
+    while(p1 < m && p2 < n) {
+        // 先赋值，再进行+1操作
+        nums1[p++] = cpArr[p1] < nums2[p2] ? cpArr[p1++] : nums2[p2++]
+    }
+    // 已经有p个元素了，多余的元素要删除，剩余的要加上
+    if (p1 < m) {
+        // 剩余元素，p1 + m + n - p = m + n - (p - p1) = m + n - p2
+        nums1.splice(p, m + n - p, ...cpArr.slice(p1, m + n - p2))
+    }
+    if (p2 < n) {
+        // 剩余元素，p2 + m + n - p = m + n - (p - p2) = m + n - p1
+        nums1.splice(p, m + n - p, ...nums2.slice(p2, m + n - p1))
+    }
+};
+```
+
+结果：
+
+- 59/59 cases passed (48 ms)
+- Your runtime beats 100 % of javascript submissions
+- Your memory usage beats 64.97 % of javascript submissions (33.8 MB)
+- 时间复杂度 `O(m + n)`
+
+**Ⅱ.从后往前**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} nums1
+ * @param {number} m
+ * @param {number[]} nums2
+ * @param {number} n
+ * @return {void} Do not return anything, modify nums1 in-place instead.
+ */
+var merge = function(nums1, m, nums2, n) {
+    // 避免 nums1 = [0,0,0,0], nums2 = [1,2] 这种 nums1.length > nums2.length 并且 m = 0
+    nums1.splice(m, nums1.length - m)
+    // 两个数组对应指针
+    let p1 = m - 1
+    let p2 = n - 1
+    // 数组指针
+    let p = m + n - 1
+    while(p1 >= 0 && p2 >= 0) {
+        // 先赋值，再进行-1操作
+        nums1[p--] = nums1[p1] < nums2[p2] ? nums2[p2--] : nums1[p1--]
+    }
+    // 可能nums2有剩余，由于指针是下标，所以截取数量需要加1
+    nums1.splice(0, p2 + 1, ...nums2.slice(0, p2 + 1))
+};
+```
+
+结果：
+
+- 59/59 cases passed (52 ms)
+- Your runtime beats 99.76 % of javascript submissions
+- Your memory usage beats 78.3 % of javascript submissions (33.6 MB)
+- 时间复杂度 `O(m + n)`
+
+**Ⅲ.合并后排序再赋值**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} nums1
+ * @param {number} m
+ * @param {number[]} nums2
+ * @param {number} n
+ * @return {void} Do not return anything, modify nums1 in-place instead.
+ */
+var merge = function(nums1, m, nums2, n) {
+    arr = [].concat(nums1.splice(0, m), nums2.splice(0, n))
+    arr.sort((a, b) => a - b)
+    for(let i = 0; i < arr.length; i++) {
+        nums1[i] = arr[i]
+    }
+};
+```
+
+结果：
+
+- 59/59 cases passed (64 ms)
+- Your runtime beats 90.11 % of javascript submissions
+- Your memory usage beats 31.21 % of javascript submissions (34.8 MB)
+- 时间复杂度 `O(m + n)`
+
+#### 查阅他人解法
+
+这里看到一个直接用两次 `while` ，然后直接用 `m/n` 来计算下标的，没有额外空间，但是本质上也是从后往前遍历。
+
+**Ⅰ.两次while**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} nums1
+ * @param {number} m
+ * @param {number[]} nums2
+ * @param {number} n
+ * @return {void} Do not return anything, modify nums1 in-place instead.
+ */
+var merge = function(nums1, m, nums2, n) {
+    // 避免 nums1 = [0,0,0,0], nums2 = [1,2] 这种 nums1.length > nums2.length 并且 m = 0
+    // nums1.splice(m, nums1.length - m)
+    // 从后开始赋值
+    while(m !== 0 && n !== 0) {
+        nums1[m + n - 1] = nums1[m - 1] > nums2[n - 1] ? nums1[--m] : nums2[--n]
+    }
+    // nums2 有剩余
+    while(n !== 0) {
+        nums1[m + n - 1] = nums2[--n]
+    }
+};
+```
+
+结果：
+
+- 59/59 cases passed (56 ms)
+- Your runtime beats 99.16 % of javascript submissions
+- Your memory usage beats 64.26 % of javascript submissions (33.8 MB)
+- 时间复杂度 `O(m + n)`
+
+#### 思考总结
+
+碰到数组操作，会优先考虑双指针法，具体指针方向可以由题目逻辑来解决。
