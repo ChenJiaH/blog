@@ -3425,6 +3425,46 @@ var climbStairs = function(n) {
 
 [解法参考官方题解](https://leetcode-cn.com/problems/climbing-stairs/solution/pa-lou-ti-by-leetcode/)
 
+代码：
+
+```javascript
+/**
+ * @param {number} n
+ * @return {number}
+ */
+var climbStairs = function(n) {
+
+    function pow(a, n) {
+        let ret = [[1,0],[0,1]] // 矩阵
+        while(n > 0) {
+            if ((n & 1) === 1) {
+                ret = multiply(ret, a)
+            }
+            n >> 1
+            a = multiply(a, a)
+        }
+        return ret;
+    }
+    function multiply(a, b) {
+        let c = [[0,0], [0,0]]
+        for (let i = 0; i < 2; i++) {
+            for(let j = 0; j < 2; j++) {
+                c[i][j] = a[i][0] * b[0][j] + a[i][1] * b[1][j]
+            }
+        }
+        return c
+    }
+
+    let q = [[1,1], [1, 0]]
+    let res = pow(q, n)
+    return res[0][0]
+};
+```
+
+结果：
+
+测试用例可以输出，提交发现超时。
+
 > 这个笔者还没完全理解，所以很抱歉，暂时没有 js 相应代码分析，后续会补上。也欢迎您补充给我，感谢！
 
 **Ⅲ.排列组合**
