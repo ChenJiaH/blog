@@ -29,6 +29,7 @@
 - [70.爬楼梯](#70爬楼梯)
 - [83.删除排序链表中的重复元素](#83删除排序链表中的重复元素)
 - [88.合并两个有序数组](#88合并两个有序数组)
+- [100.相同的树](#100相同的树)
 
 ## Easy
 
@@ -3825,3 +3826,137 @@ var merge = function(nums1, m, nums2, n) {
 #### 思考总结
 
 碰到数组操作，会优先考虑双指针法，具体指针方向可以由题目逻辑来决定。
+
+### 100.相同的树
+
+[题目地址](https://leetcode-cn.com/problems/same-tree/)
+
+#### 题目描述
+
+给定两个二叉树，编写一个函数来检验它们是否相同。
+
+如果两个树在结构上相同，并且节点具有相同的值，则认为它们是相同的。
+
+示例：
+
+```javascript
+输入:       1         1
+          / \       / \
+         2   3     2   3
+
+        [1,2,3],   [1,2,3]
+
+输出: true
+
+输入:      1          1
+          /           \
+         2             2
+
+        [1,2],     [1,null,2]
+
+输出: false
+
+输入:       1         1
+          / \       / \
+         2   1     1   2
+
+        [1,2,1],   [1,1,2]
+
+输出: false
+```
+
+#### 题目分析设想
+
+题目直接说了是二叉树，而二叉树的遍历方式有两种：深度优先和广度优先，我就从这两个思路来作答。
+
+#### 编写代码验证
+
+**Ⅰ.深度优先**
+
+代码：
+
+```javascript
+/**
+ * @param {TreeNode} p
+ * @param {TreeNode} q
+ * @return {boolean}
+ */
+var isSameTree = function(p, q) {
+    if (p === null && q === null) return true
+    if (p === null || q === null) return false
+
+    if (p.val !== q.val) return false
+
+    return isSameTree(p.left, q.left) && isSameTree(p.right, q.right)
+};
+```
+
+结果：
+
+- 57/57 cases passed (52 ms)
+- Your runtime beats 98.81 % of javascript submissions
+- Your memory usage beats 16.66 % of javascript submissions (33.8 MB)
+- 时间复杂度 `O(n)` ，`n` 为节点个数
+
+**Ⅱ.广度优先**
+
+代码：
+
+```javascript
+/**
+ * @param {TreeNode} p
+ * @param {TreeNode} q
+ * @return {boolean}
+ */
+var isSameTree = function(p, q) {
+    if (p === null && q === null) return true
+    if (p === null || q === null) return false
+
+    let pQ =[p] // 左侧比较队列
+    let qQ =[q] // 右侧比较队列
+
+    let res = true
+
+    while(true) {
+        if (!pQ.length || !qQ.length) {
+            res = pQ.length === qQ.length
+            break
+        }
+        // 当前比较节点
+        let curP = pQ.shift()
+        let curQ = qQ.shift()
+        if ((curP && !curQ) || (!curP && curQ) || (curP && curQ && curP.val !== curQ.val)) {
+            res = false
+            break
+        } else {
+            let pL = curP ? curP.left : null
+            let pR = curP ? curP.right : null
+            if (pL || pR) { // 至少一个存在才有意义
+                pQ.push(pL, pR) // 依次推入比较数组，实际上就是广度优先
+            }
+            let qL = curQ ? curQ.left : null
+            let qR = curQ ? curQ.right : null
+            if (qL || qR) { // 至少一个存在才有意义
+                qQ.push(qL, qR) // 依次推入比较数组，实际上就是广度优先
+            }
+        }
+    }
+
+    return res
+};
+```
+
+结果：
+
+- 57/57 cases passed (64 ms)
+- Your runtime beats 73.27 % of javascript submissions
+- Your memory usage beats 15.53 % of javascript submissions (33.8 MB)
+- 时间复杂度 `O(n)` ，`n` 为节点个数
+
+#### 查阅他人解法
+
+思路基本上都是这两种，未发现方向不同的解法。
+
+#### 思考总结
+
+一般碰到二叉树的题，要么就深度遍历，要么就广度遍历。深度优先，也叫先序遍历。
