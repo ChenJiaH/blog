@@ -30,6 +30,7 @@
 - [83.删除排序链表中的重复元素](#83删除排序链表中的重复元素)
 - [88.合并两个有序数组](#88合并两个有序数组)
 - [100.相同的树](#100相同的树)
+- [101.对称二叉树](#101对称二叉树)
 
 ## Easy
 
@@ -3960,3 +3961,157 @@ var isSameTree = function(p, q) {
 #### 思考总结
 
 一般碰到二叉树的题，要么就深度遍历，要么就广度遍历。深度优先，也叫先序遍历。
+
+### 101.对称二叉树
+
+[题目地址](https://leetcode-cn.com/problems/symmetric-tree/)
+
+#### 题目描述
+
+给定一个二叉树，检查它是否是镜像对称的。
+
+例如，二叉树 `[1,2,2,3,4,4,3]` 是对称的。
+
+示例：
+
+```javascript
+    1
+   / \
+  2   2
+ / \ / \
+3  4 4  3
+```
+
+但是下面这个 `[1,2,2,null,3,null,3]` 则不是镜像对称的:
+
+```javascript
+   1
+   / \
+  2   2
+   \   \
+   3    3
+```
+
+说明:
+
+如果你可以运用递归和迭代两种方法解决这个问题，会很加分。
+
+#### 题目分析设想
+
+还是一道二叉树的题，所以常规思路就是遍历操作，深度优先或广度优先都可。镜像对称可以观察到很明显的特点是有相同的根节点值，且每个树的右子树与另一个树的左字数对称相等。深度优先的方式，其实就是递归的思路，符合题目的说明。
+
+#### 编写代码验证
+
+**Ⅰ.深度优先**
+
+代码：
+
+```javascript
+/**
+ * @param {TreeNode} root
+ * @return {boolean}
+ */
+var isSymmetric = function(root) {
+    function isMirror (l, r) {
+        if (l === null && r === null) return true
+        if (l === null || r === null) return false
+
+        return l.val === r.val && isMirror(l.left, r.right) && isMirror(l.right, r.left)
+    }
+    return isMirror(root, root)
+};
+```
+
+结果：
+
+- 195/195 cases passed (68 ms)
+- Your runtime beats 87.74 % of javascript submissions
+- Your memory usage beats 41.48 % of javascript submissions (35.5 MB)
+- 时间复杂度 `O(n)` ，`n` 为节点个数
+
+**Ⅱ.广度优先**
+
+代码：
+
+```javascript
+/**
+ * @param {TreeNode} root
+ * @return {boolean}
+ */
+var isSymmetric = function(root) {
+    if (root === null) return true
+    // 初始队列
+    let q = [root.left, root.right]
+    // 依次将同级push进队列，每次取两个对称节点进行判断
+    while(q.length) {
+        let l = q.shift()
+        let r = q.shift()
+        if (l === null && r === null) continue
+        if (l === null || r === null) return false
+        if (l.val !== r.val) return false
+
+        q.push(l.left, r.right, l.right, r.left)
+    }
+    return true
+};
+```
+
+结果：
+
+- 195/195 cases passed (64 ms)
+- Your runtime beats 94.88 % of javascript submissions
+- Your memory usage beats 28.3 % of javascript submissions (35.6 MB)
+- 时间复杂度 `O(n)` ，`n` 为节点个数
+
+#### 查阅他人解法
+
+看到一个有意思的思路，将树按照左中右的顺序输入到数组，加上层数，该数组也是对称的。
+
+**Ⅰ.左中右顺序输出数组**
+
+代码：
+
+```javascript
+/**
+ * @param {TreeNode} root
+ * @return {boolean}
+ */
+var isSymmetric = function(root) {
+    if (root === null) return true
+    // 输出数组
+    let arr = []
+    search(arr, root, 1);
+    // 入参分别为输出，节点和层级
+    function search(output, n, k) {
+        if (n.left !== null) {
+            search(output, n.left, k+1)
+        }
+        output.push(`${n.val},${k}`)
+
+        if (n.right !== null) {
+            search(output, n.right, k + 1);
+        }
+    }
+     //判断是否对称
+     let i = 0, j = arr.length - 1
+     while (i < j) {
+         if (arr[i] != arr[j]) {
+             return false
+         }
+         i++
+         j--
+     }
+     return true
+};
+```
+
+结果：
+
+- 195/195 cases passed (72 ms)
+- Your runtime beats 76.3 % of javascript submissions
+- Your memory usage beats 6.11 % of javascript submissions (36.3 MB)
+- 时间复杂度 `O(n)` ，`n` 为节点个数
+
+#### 思考总结
+
+这道题的大致解法都是遍历节点或者利用队列，只是在递归的细节上会有些差异。左中右输出数组的思路很清奇，虽然效率明显会更低下，但是不失为一种思路。
