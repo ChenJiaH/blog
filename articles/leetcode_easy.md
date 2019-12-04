@@ -31,6 +31,7 @@
 - [88.合并两个有序数组](#88合并两个有序数组)
 - [100.相同的树](#100相同的树)
 - [101.对称二叉树](#101对称二叉树)
+- [104.二叉树的最大深度](#104二叉树的最大深度)
 
 ## Easy
 
@@ -4115,3 +4116,148 @@ var isSymmetric = function(root) {
 #### 思考总结
 
 这道题的大致解法都是遍历节点或者利用队列，只是在递归的细节上会有些差异。左中右输出数组的思路很清奇，虽然效率明显会更低下，但是不失为一种思路。
+
+### 104.二叉树的最大深度
+
+[题目地址](https://leetcode-cn.com/problems/maximum-depth-of-binary-tree/)
+
+#### 题目描述
+
+给定一个二叉树，找出其最大深度。
+
+二叉树的深度为根节点到最远叶子节点的最长路径上的节点数。
+
+说明: 叶子节点是指没有子节点的节点。
+
+示例：
+
+给定二叉树 `[3,9,20,null,null,15,7]`，
+
+```javascript
+    3
+   / \
+  9  20
+    /  \
+   15   7
+```
+
+返回它的最大深度 3 。
+
+#### 题目分析设想
+
+这道题最基本的思路就是计算出每条子节点的深度，再进行比较。为了提升效率，可以增加同级比对，去除不可能是最长节点的叶节点计算。
+
+所以这里我就用以下几种思路来实现深度优先算法。
+
+- 递归，直接获取子树最大高度加 1
+- 利用队列，求深度转化为求有多少层
+
+#### 编写代码验证
+
+**Ⅰ.递归**
+
+代码：
+
+```javascript
+/**
+ * @param {TreeNode} root
+ * @return {number}
+ */
+var maxDepth = function(root) {
+    if (root === null) return 0
+    // 左侧子树的最大高度
+    let l = maxDepth(root.left)
+    // 右侧子树的最大高度
+    let r = maxDepth(root.right)
+    return Math.max(l, r) + 1
+};
+```
+
+结果：
+
+- 39/39 cases passed (60 ms)
+- Your runtime beats 99 % of javascript submissions
+- Your memory usage beats 45.77 % of javascript submissions (37.1 MB)
+- 时间复杂度 `O(n)` ，`n` 为节点个数
+
+**Ⅱ.利用队列**
+
+代码：
+
+```javascript
+/**
+ * @param {TreeNode} root
+ * @return {number}
+ */
+var maxDepth = function(root) {
+    if (root === null) return 0
+    // 队列
+    let q = [root]
+    let dep = 0
+    while(q.length) {
+        let size = q.length
+        dep++
+        while(size > 0) {
+            let node = q.shift()
+            if (node.left !== null) q.push(node.left)
+            if (node.right !== null) q.push(node.right)
+            size--
+        }
+    }
+    return dep
+};
+```
+
+结果：
+
+- 39/39 cases passed (68 ms)
+- Your runtime beats 91.33 % of javascript submissions
+- Your memory usage beats 30.1 % of javascript submissions (37.2 MB)
+- 时间复杂度 `O(n)` ，`n` 为节点个数
+
+#### 查阅他人解法
+
+这里看到一个用栈的角度来实现的，取栈高度的最大值，其他的基本都是循环的细节差异，大体思路一致。
+
+**Ⅰ.利用栈**
+
+代码：
+
+```javascript
+/**
+ * @param {TreeNode} root
+ * @return {number}
+ */
+var maxDepth = function(root) {
+    if (root === null) return 0
+    // 栈
+    let s = [{
+        node: root,
+        dep: 1
+    }]
+    let dep = 0
+
+    while(s.length) {
+        // 先进后出
+        var cur = s.pop()
+        if (cur.node !== null) {
+            let curDep = cur.dep
+            dep = Math.max(dep, curDep)
+            if (cur.node.left !== null) s.push({node: cur.node.left, dep: curDep + 1})
+            if (cur.node.right !== null) s.push({node: cur.node.right, dep: curDep + 1})
+        }
+    }
+    return dep
+};
+```
+
+结果：
+
+- 39/39 cases passed (72 ms)
+- Your runtime beats 81.41 % of javascript submissions
+- Your memory usage beats 66.6 % of javascript submissions (37 MB)
+- 时间复杂度 `O(n)` ，`n` 为节点个数
+
+#### 思考总结
+
+二叉树的操作，一般就是深度优先和广度优先，所以基本上就朝这两个方向上去解，然后进行优化就可以了。
