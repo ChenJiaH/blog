@@ -33,6 +33,7 @@
 - [101.对称二叉树](#101对称二叉树)
 - [104.二叉树的最大深度](#104二叉树的最大深度)
 - [107.二叉树的层次遍历II](#107二叉树的层次遍历II)
+- [108.将有序数组转换为二叉搜索树](#108将有序数组转换为二叉搜索树)
 
 ## Easy
 
@@ -4426,3 +4427,124 @@ function levelOrder(node, floor, arr) {
 #### 思考总结
 
 二叉树的题目就根据情况在深度优先和广度优先中择优选择即可，基本不会有太大的问题。
+
+### 108.将有序数组转换为二叉搜索树
+
+[题目地址](https://leetcode-cn.com/problems/convert-sorted-array-to-binary-search-tree/)
+
+#### 题目描述
+
+将一个按照升序排列的有序数组，转换为一棵高度平衡二叉搜索树。
+
+本题中，一个高度平衡二叉树是指一个二叉树每个节点 的左右两个子树的高度差的绝对值不超过 1。
+
+示例:
+
+```javascript
+给定有序数组: [-10,-3,0,5,9],
+
+一个可能的答案是：[0,-3,9,-10,null,5]，它可以表示下面这个高度平衡二叉搜索树：
+
+      0
+     / \
+   -3   9
+   /   /
+ -10  5
+```
+
+#### 题目分析设想
+
+这里有两点要注意的：高度平衡二叉树要求每个节点的左右两个子树的高度差的绝对值不超过 1；而二叉搜索树要求左子树上所有节点值小于根节点，右子树上所有节点值大于根节点。
+
+而题目给出的是一个有序的数组，所以可以直接考虑二分后进行处理，我这就直接递归作答：找到根节点，递归生成左右子树。
+
+#### 编写代码验证
+
+**Ⅰ.递归**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {TreeNode}
+ */
+var sortedArrayToBST = function(nums) {
+    if (!nums.length) return null
+    // 中位数，用偏移避免溢出
+    const mid = nums.length >>> 1
+    const root = new TreeNode(nums[mid])
+    root.left = sortedArrayToBST(nums.slice(0, mid))
+    root.right = sortedArrayToBST(nums.slice(mid + 1))
+    return root
+};
+```
+
+结果：
+
+- 32/32 cases passed (80 ms)
+- Your runtime beats 70.72 % of javascript submissions
+- Your memory usage beats 29.79 % of javascript submissions (37.8 MB)
+- 时间复杂度 `O(n)`
+
+#### 查阅他人解法
+
+这里看到另外一种解法，先创建一个平衡二叉树，然后中序遍历树同时遍历数组即可，因为中序遍历出来的刚好是有序数组。
+
+**Ⅰ.创建树后中序遍历数组赋值**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {TreeNode}
+ */
+var sortedArrayToBST = function(nums) {
+    if (!nums.length) return null
+
+    // 节点总数
+    let len = nums.length
+    let root = new TreeNode(-1);
+    let q = [root]
+    // 已经创建了根节点
+    len--
+    while(len) {
+        const node = q.shift()
+        // 左子树
+        const l = new TreeNode(-1)
+        q.push(l)
+        node.left = l
+        len--
+        if (len) {
+            // 右子树
+            const r = new TreeNode(-1)
+            q.push(r)
+            node.right = r
+            len--
+        }
+    }
+
+    let i = 0
+    inorder(root)
+    function inorder(node) {
+        if (node === null) return
+        inorder(node.left)
+        node.val = nums[i++]
+        inorder(node.right)
+    }
+
+    return root
+};
+```
+
+结果：
+
+- 32/32 cases passed (72 ms)
+- Your runtime beats 93.4 % of javascript submissions
+- Your memory usage beats 24.12 % of javascript submissions (37.8 MB)
+- 时间复杂度 `O(n)`
+
+#### 思考总结
+
+这里其实是个逆向思维，之前是二叉树输出数组，现在变成数组转成二叉树。刚好可以翻一下前序中序和后序的区别，这里中序就可以了。不过这道题我还是更推荐递归二分求解。
