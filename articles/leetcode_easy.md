@@ -32,6 +32,7 @@
 - [100.相同的树](#100相同的树)
 - [101.对称二叉树](#101对称二叉树)
 - [104.二叉树的最大深度](#104二叉树的最大深度)
+- [107.二叉树的层次遍历II](#107二叉树的层次遍历II)
 
 ## Easy
 
@@ -4087,7 +4088,6 @@ var isSymmetric = function(root) {
         if (n.left !== null) {
             search(output, n.left, k+1)
         }
-        output.push(`${n.val},${k}`)
 
         if (n.right !== null) {
             search(output, n.right, k + 1);
@@ -4261,3 +4261,168 @@ var maxDepth = function(root) {
 #### 思考总结
 
 二叉树的操作，一般就是深度优先和广度优先，所以基本上就朝这两个方向上去解，然后进行优化就可以了。
+
+### 107.二叉树的层次遍历II
+
+[题目地址](https://leetcode-cn.com/problems/binary-tree-level-order-traversal-ii/)
+
+#### 题目描述
+
+给定一个二叉树，返回其节点值自底向上的层次遍历。 （即按从叶子节点所在层到根节点所在的层，逐层从左向右遍历）
+
+例如：
+
+给定二叉树 `[3,9,20,null,null,15,7]`,
+
+```javascript
+    3
+   / \
+  9  20
+    /  \
+   15   7
+```
+
+返回其自底向上的层次遍历为：
+
+```javascript
+[
+  [15,7],
+  [9,20],
+  [3]
+]
+```
+
+#### 题目分析设想
+
+这道题在我看来还是两种方式，深度优先和广度优先。
+
+- 深度优先，记录下每个节点对应的层数后，按层数反向输出即可
+- 广度优先，记录下每层的节点后反向输出
+
+#### 编写代码验证
+
+**Ⅰ.深度优先**
+
+代码：
+
+```javascript
+/**
+ * @param {TreeNode} root
+ * @return {number[][]}
+ */
+var levelOrderBottom = function(root) {
+    // 当前层级标识
+    let idx = 0
+    let res = []
+
+    function levelOrder(node, floor, arr) {
+        if (node === null) return arr
+        if(arr[floor]) {
+            arr[floor].push(node.val)
+        } else {
+            arr[floor] = [node.val]
+        }
+        levelOrder(node.left, floor + 1, arr)
+        levelOrder(node.right, floor + 1, arr)
+        return arr
+    }
+
+    return levelOrder(root, idx, res).reverse()
+};
+```
+
+结果：
+
+- 34/34 cases passed (68 ms)
+- Your runtime beats 77.01 % of javascript submissions
+- Your memory usage beats 34.78 % of javascript submissions (34.7 MB)
+- 时间复杂度 `O(n)` ，`n` 为节点个数
+
+**Ⅱ.广度优先**
+
+代码：
+
+```javascript
+/**
+ * @param {TreeNode} root
+ * @return {number[][]}
+ */
+var levelOrderBottom = function(root) {
+    if (root === null) return []
+    // 初始队列
+    let q = [root]
+    let res = []
+
+    while(q.length) {
+        // 当前层节点数量
+        const count = q.length
+        let curArr = []
+        for(let i = 0; i < count;i++) {
+            const node = q.shift()
+            curArr.push(node.val)
+            // 将子节点依次推入队列
+            if (node.left) q.push(node.left)
+            if (node.right ) q.push(node.right )
+        }
+        res.push(curArr)
+    }
+    return res.reverse()
+};
+```
+
+结果：
+
+- 34/34 cases passed (64 ms)
+- Your runtime beats 89.2 % of javascript submissions
+- Your memory usage beats 32.3 % of javascript submissions (34.7 MB)
+- 时间复杂度 `O(n)` ，`n` 为节点个数
+
+#### 查阅他人解法
+
+没有看到什么特别的解法，主要都是按 BFS 和 DFS 来处理，要么迭代，要么递归等等。
+
+这里就介绍下别的吧，在第一种解法中我们使用的是前序优先，当然用中序优先或后序优先也可以，下面代码可以说明区别：
+
+```javascript
+// 先序，顺序为 根 -> 左 -> 右
+function levelOrder(node, floor, arr) {
+    if(arr[floor]) {
+        arr[floor].push(node.val)
+    } else {
+        arr[floor] = [node.val]
+    }
+
+    levelOrder(node.left, floor + 1, arr)
+    levelOrder(node.right, floor + 1, arr)
+    return arr
+}
+// 中序，顺序为 左 -> 根 -> 右
+function levelOrder(node, floor, arr) {
+    levelOrder(node.left, floor + 1, arr)
+
+   if(arr[floor]) {
+       arr[floor].push(node.val)
+   } else {
+       arr[floor] = [node.val]
+   }
+
+    levelOrder(node.right, floor + 1, arr)
+    return arr
+}
+// 后序，顺序为 左 -> 右 -> 根
+function levelOrder(node, floor, arr) {
+    levelOrder(node.left, floor + 1, arr)
+    levelOrder(node.right, floor + 1, arr)
+
+    if(arr[floor]) {
+        arr[floor].push(node.val)
+    } else {
+        arr[floor] = [node.val]
+    }
+    return arr
+}
+```
+
+#### 思考总结
+
+二叉树的题目就根据情况在深度优先和广度优先中择优选择即可，基本不会有太大的问题。
