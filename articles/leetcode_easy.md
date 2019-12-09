@@ -34,6 +34,7 @@
 - [104.二叉树的最大深度](#104二叉树的最大深度)
 - [107.二叉树的层次遍历II](#107二叉树的层次遍历II)
 - [108.将有序数组转换为二叉搜索树](#108将有序数组转换为二叉搜索树)
+- [110.平衡二叉树](#110平衡二叉树)
 
 ## Easy
 
@@ -4548,3 +4549,120 @@ var sortedArrayToBST = function(nums) {
 #### 思考总结
 
 这里其实是个逆向思维，之前是二叉树输出数组，现在变成数组转成二叉树。刚好可以翻一下前序中序和后序的区别，这里中序就可以了。不过这道题我还是更推荐递归二分求解。
+
+### 110.平衡二叉树
+
+[题目地址](https://leetcode-cn.com/problems/balanced-binary-tree/)
+
+#### 题目描述
+
+给定一个二叉树，判断它是否是高度平衡的二叉树。
+
+本题中，一棵高度平衡二叉树定义为：
+
+> 一个二叉树每个节点 的左右两个子树的高度差的绝对值不超过1。
+
+示例 1:
+
+给定二叉树 `[3,9,20,null,null,15,7]`
+
+```javascript
+    3
+   / \
+  9  20
+    /  \
+   15   7
+```
+
+返回 `true` 。
+
+示例 2:
+
+给定二叉树 `[1,2,2,3,3,null,null,4,4]`
+
+```javascript
+       1
+      / \
+     2   2
+    / \
+   3   3
+  / \
+ 4   4
+```
+
+返回 `false` 。
+
+#### 题目分析设想
+
+我们上一期做过通过遍历求二叉树的最大深度的题目，这题最粗暴的一个方案就是计算出每个子树的最大深度做高度判断，很明显，这个效率低下。我们可以通过改成自底而上的方案，当中间过程不符合，则可以跳出计算。
+
+#### 编写代码验证
+
+**Ⅰ.计算子树最大深度做判断**
+
+代码：
+
+```javascript
+/**
+ * @param {TreeNode} root
+ * @return {boolean}
+ */
+var isBalanced = function(root) {
+    if (root === null) return true
+    function maxDepth (node) {
+        if (node === null) return 0
+        const l = maxDepth(node.left)
+        const r = maxDepth(node.right)
+        return Math.max(l, r) + 1
+    }
+
+    return Math.abs(maxDepth(root.left) - maxDepth(root.right)) <= 1
+    && isBalanced(root.left)
+    && isBalanced(root.right)
+};
+```
+
+结果：
+
+- 227/227 cases passed (80 ms)
+- Your runtime beats 77.66 % of javascript submissions
+- Your memory usage beats 26.73 % of javascript submissions (37.8 MB)
+- 时间复杂度 `O(n^2)`
+
+**Ⅱ.自底而上**
+
+代码：
+
+```javascript
+/**
+ * @param {TreeNode} root
+ * @return {boolean}
+ */
+var isBalanced = function(root) {
+    function maxDepth (node) {
+        if (node === null) return 0
+        const l = maxDepth(node.left)
+        if (l === -1) return -1
+        const r = maxDepth(node.right)
+        if (r === -1) return -1
+        return Math.abs(l - r) <= 1 ? Math.max(l, r) + 1 : -1
+    }
+
+    return maxDepth(root) !== -1
+};
+```
+
+结果：
+
+- 227/227 cases passed (72 ms)
+- Your runtime beats 95.44 % of javascript submissions
+- Your memory usage beats 50.5 % of javascript submissions (37.5 MB)
+- 时间复杂度 `O(n)`
+
+#### 查阅他人解法
+
+思路基本上都是这两种，未发现方向不同的解法。
+
+#### 思考总结
+
+这里很明显，大家都是用深度遍历来解决问题，计算子树深度会发现，有很多重复运算，所以不妨试试自底而上的方式，直接在计算高度过程中就返回，也可以叫做“提前阻断”。所以，这道题建议是使用自底而上的方式来作答。
