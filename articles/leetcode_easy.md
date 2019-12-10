@@ -35,6 +35,7 @@
 - [107.二叉树的层次遍历II](#107二叉树的层次遍历II)
 - [108.将有序数组转换为二叉搜索树](#108将有序数组转换为二叉搜索树)
 - [110.平衡二叉树](#110平衡二叉树)
+- [111.二叉树的最小深度](#111二叉树的最小深度)
 
 ## Easy
 
@@ -4666,3 +4667,152 @@ var isBalanced = function(root) {
 #### 思考总结
 
 这里很明显，大家都是用深度遍历来解决问题，计算子树深度会发现，有很多重复运算，所以不妨试试自底而上的方式，直接在计算高度过程中就返回，也可以叫做“提前阻断”。所以，这道题建议是使用自底而上的方式来作答。
+
+### 111.二叉树的最小深度
+
+[题目地址](https://leetcode-cn.com/problems/minimum-depth-of-binary-tree/)
+
+#### 题目描述
+
+给定一个二叉树，找出其最小深度。
+
+最小深度是从根节点到最近叶子节点的最短路径上的节点数量。
+
+**说明:** 叶子节点是指没有子节点的节点。
+
+示例：
+
+给定二叉树 `[3,9,20,null,null,15,7],`
+
+```javascript
+    3
+   / \
+  9  20
+    /  \
+   15   7
+```
+
+返回它的最小深度  2.
+
+#### 题目分析设想
+
+这道题很明显自顶而下就可以了，判断每个节点的子节点是否存在，不存在，则该路径为最短路径。如果存在，就按深度的方式比较最小值。总体上来说，也可以用之前求最大深度的几种方式来作答。
+
+#### 编写代码验证
+
+**Ⅰ.递归**
+
+代码：
+
+```javascript
+/**
+ * @param {TreeNode} root
+ * @return {number}
+ */
+var minDepth = function(root) {
+    if (root === null) return 0
+    if (root.left === null && root.right === null) return 1
+    let res = Infinity
+    if(root.left !== null) {
+        res = Math.min(minDepth(root.left), res)
+    }
+    if(root.right !== null) {
+        res = Math.min(minDepth(root.right), res)
+    }
+    return res + 1
+};
+```
+
+结果：
+
+- 41/41 cases passed (76 ms)
+- Your runtime beats 69.08 % of javascript submissions
+- Your memory usage beats 5.55 % of javascript submissions (37.9 MB)
+- 时间复杂度 `O(n)`
+
+**Ⅱ.利用栈迭代**
+
+代码：
+
+```javascript
+/**
+ * @param {TreeNode} root
+ * @return {number}
+ */
+var minDepth = function(root) {
+    if (root === null) return 0
+    if (root.left === null && root.right === null) return 1
+    // 栈
+    let s = [{
+        node: root,
+        dep: 1
+    }]
+    let dep = Infinity
+    while(s.length) {
+        // 先进后出
+        var cur = s.pop()
+        if (cur.node !== null) {
+            let curDep = cur.dep
+            if (cur.node.left === null && cur.node.right === null) {
+                dep = Math.min(dep, curDep)
+            }
+            if (cur.node.left !== null) s.push({node: cur.node.left, dep: curDep + 1})
+            if (cur.node.right !== null) s.push({node: cur.node.right, dep: curDep + 1})
+        }
+    }
+    return dep
+};
+```
+
+结果：
+
+- 41/41 cases passed (68 ms)
+- Your runtime beats 93.82 % of javascript submissions
+- Your memory usage beats 75.31 % of javascript submissions (37 MB)
+- 时间复杂度 `O(n)`
+
+**Ⅲ.利用队列**
+
+代码：
+
+```javascript
+/**
+ * @param {TreeNode} root
+ * @return {number}
+ */
+var minDepth = function(root) {
+    if (root === null) return 0
+    if (root.left === null && root.right === null) return 1
+    // 队列
+    let s = [{
+        node: root,
+        dep: 1
+    }]
+    let dep = 0
+    while(s.length) {
+        // 先进后出
+        var cur = s.shift()
+        var node = cur.node
+        dep = cur.dep
+        if (node.left === null && node.right === null) break;
+        if (node.left !== null) s.push({node: node.left, dep: dep + 1})
+        if (node.right !== null) s.push({node: node.right, dep: dep + 1})
+    }
+    return dep
+};
+```
+
+结果：
+
+- 41/41 cases passed (76 ms)
+- Your runtime beats 69.08 % of javascript submissions
+- Your memory usage beats 6.79 % of javascript submissions (37.7 MB)
+- 时间复杂度 `O(n)`
+
+#### 查阅他人解法
+
+总体上而言分成深度优先和广度优先，最基本的就是递归和迭代了。没有发现二叉树相关题目的一些新奇解法。
+
+#### 思考总结
+
+很明显可以看出递归和利用栈迭代是深度优先，利用队列是广度优先。这里自顶而下比较合适，只要找到叶子节点，直接就是最小深度了，可以省去不少运算。
