@@ -36,6 +36,7 @@
 - [108.将有序数组转换为二叉搜索树](#108将有序数组转换为二叉搜索树)
 - [110.平衡二叉树](#110平衡二叉树)
 - [111.二叉树的最小深度](#111二叉树的最小深度)
+- [112.路径总和](#112路径总和)
 
 ## Easy
 
@@ -4790,7 +4791,7 @@ var minDepth = function(root) {
     }]
     let dep = 0
     while(s.length) {
-        // 先进后出
+        // 先进先出
         var cur = s.shift()
         var node = cur.node
         dep = cur.dep
@@ -4816,3 +4817,160 @@ var minDepth = function(root) {
 #### 思考总结
 
 很明显可以看出递归和利用栈迭代是深度优先，利用队列是广度优先。这里自顶而下比较合适，只要找到叶子节点，直接就是最小深度了，可以省去不少运算。
+
+### 112.路径总和
+
+[题目地址](https://leetcode-cn.com/problems/path-sum/)
+
+#### 题目描述
+
+给定一个二叉树和一个目标和，判断该树中是否存在根节点到叶子节点的路径，这条路径上所有节点值相加等于目标和。
+
+说明: 叶子节点是指没有子节点的节点。
+
+示例:
+
+给定如下二叉树，以及目标和 `sum = 22`，
+
+```javascript
+              5
+             / \
+            4   8
+           /   / \
+          11  13  4
+         /  \      \
+        7    2      1
+```
+
+返回 `true`, 因为存在目标和为 22 的根节点到叶子节点的路径 `5->4->11->2`。
+
+#### 题目分析设想
+
+这道题我的想法是因为要找到叶子节点，所以深度优先更为合适，这里就使用前文的两种方法：
+
+- 递归
+- 利用栈迭代
+
+#### 编写代码验证
+
+**Ⅰ.递归**
+
+代码：
+
+```javascript
+/**
+ * @param {TreeNode} root
+ * @param {number} sum
+ * @return {boolean}
+ */
+var hasPathSum = function(root, sum) {
+    if (root === null) return false
+    // 剩余需要的值
+    sum -= root.val
+    if (root.left === null && root.right === null) {
+        return sum === 0
+    } else {
+        return hasPathSum(root.left, sum) || hasPathSum(root.right, sum)
+    }
+};
+```
+
+结果：
+
+- 114/114 cases passed (80 ms)
+- Your runtime beats 62.09 % of javascript submissions
+- Your memory usage beats 56.9 % of javascript submissions (37.1 MB)
+- 时间复杂度 `O(n)`
+
+**Ⅱ.迭代**
+
+代码：
+
+```javascript
+/**
+ * @param {TreeNode} root
+ * @param {number} sum
+ * @return {boolean}
+ */
+var hasPathSum = function(root, sum) {
+    if (root === null) return false
+    // 栈
+    let stack = [{
+        node: root,
+        remain: sum - root.val
+    }]
+    while(stack.length) {
+        // 先进后出
+        var cur = stack.pop()
+        var node = cur.node
+        if (node.left === null && node.right === null && cur.remain === 0) return true
+        if (node.left !== null) {
+            stack.push({
+                node: node.left,
+                remain: cur.remain - node.left.val
+            })
+        }
+        if (node.right !== null) {
+            stack.push({
+                node: node.right,
+                remain: cur.remain - node.right.val
+            })
+        }
+    }
+    return false
+};
+```
+
+结果：
+
+- 114/114 cases passed (72 ms)
+- Your runtime beats 88.51 % of javascript submissions
+- Your memory usage beats 33.33 % of javascript submissions (37.2 MB)
+- 时间复杂度 `O(n)`
+
+#### 查阅他人解法
+
+这里看到一个方案是采用后序遍历，路径长度由之前的栈改成变量保存，但是这个在我看来没有中序遍历合适，感兴趣的可以 [点此查阅](https://leetcode-cn.com/problems/path-sum/solution/hou-xu-bian-li-qiu-lu-jing-he-by-watson-14/) 。另外还是有选择使用广度优先，利用队列来解的，这里也算一个不同思路，就当做补充吧。
+
+**Ⅰ.利用队列**
+
+代码：
+
+```javascript
+/**
+ * @param {TreeNode} root
+ * @param {number} sum
+ * @return {boolean}
+ */
+var hasPathSum = function(root, sum) {
+    if (root === null) return false
+    // 队列
+    let q = [{
+        node: root,
+        sum: root.val
+    }]
+    while(q.length) {
+        // 当前层元素的个数
+        for(let i = 0; i < q.length; i++) {
+            let cur = q.shift()
+            let node = cur.node
+            if (node.left === null && node.right === null && cur.sum === sum) return true
+
+            if (node.left !== null) {
+                q.push({ node: node.left, sum: cur.sum + node.left.val})
+            }
+            if (node.right !== null) {
+                q.push({ node: node.right, sum: cur.sum + node.right.val})
+            }
+        }
+    }
+    return false
+};
+```
+
+结果：
+
+- 114/114 cases passed (72 ms)
+- Your runtime beats 88.51 % of javascript submissions
+- Your memory usage beats 56.32 % of javascript submissions (37.1 MB)
+- 时间复杂度 `O(n)`
