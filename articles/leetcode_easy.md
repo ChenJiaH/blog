@@ -37,6 +37,7 @@
 - [110.平衡二叉树](#110平衡二叉树)
 - [111.二叉树的最小深度](#111二叉树的最小深度)
 - [112.路径总和](#112路径总和)
+- [118.杨辉三角](#118杨辉三角)
 
 ## Easy
 
@@ -4974,3 +4975,171 @@ var hasPathSum = function(root, sum) {
 - Your runtime beats 88.51 % of javascript submissions
 - Your memory usage beats 56.32 % of javascript submissions (37.1 MB)
 - 时间复杂度 `O(n)`
+
+### 118.杨辉三角
+
+[题目地址](https://leetcode-cn.com/problems/pascals-triangle/)
+
+#### 题目描述
+
+给定一个非负整数 numRows，生成杨辉三角的前 numRows 行。
+
+![杨辉三角](https://upload.wikimedia.org/wikipedia/commons/0/0d/PascalTriangleAnimated2.gif)
+
+在杨辉三角中，每个数是它左上方和右上方的数的和。
+
+示例:
+
+```javascript
+输入: 5
+输出:
+[
+     [1],
+    [1,1],
+   [1,2,1],
+  [1,3,3,1],
+ [1,4,6,4,1]
+]
+```
+
+#### 题目分析设想
+
+这道题最笨的方案就是双重循环，首尾为1，其他位为 `S(l)[n] = S(l-1)[n-1] + S(l-1)[n]` 。当然这里很明显也可以当做一个动态规划问题来解答。
+
+#### 编写代码验证
+
+**Ⅰ.动态规划**
+
+代码：
+
+```javascript
+/**
+ * @param {number} numRows
+ * @return {number[][]}
+ */
+var generate = function(numRows) {
+    let res = []
+    for(let i = 0; i < numRows; i++) {
+        // 所有默认都填了1，可以节省不少运算
+        res.push(new Array(i+1).fill(1))
+        // 第三行开始才需要修改
+        for(j = 1; j < i; j++) {
+            res[i][j] = res[i-1][j] + res[i-1][j-1]
+        }
+    }
+    return res
+};
+```
+
+结果：
+
+- 15/15 cases passed (60 ms)
+- Your runtime beats 85.2 % of javascript submissions
+- Your memory usage beats 55.52 % of javascript submissions (33.6 MB)
+- 时间复杂度 `O(n^2)`
+
+#### 查阅他人解法
+
+这里看到两个不同方向的，一个是递归，因为这题在递归卡片中，一个是二项式定理。
+
+**Ⅰ.递归**
+
+代码：
+
+```javascript
+/**
+ * @param {number} numRows
+ * @return {number[][]}
+ */
+var generate = function (numRows) {
+    let res = []
+
+    function sub(row, numRows, arr) {
+        let temp = []
+        if (row < numRows) {
+            for (let i = 0; i <= row; i++) {
+                if (row === 0) {
+                    temp.push(1)
+                } else {
+                    let left = i - 1 >= 0 ? arr[row - 1][i - 1] : 0
+                    let right = i < arr[row - 1].length ? arr[row - 1][i] : 0
+                    temp.push(left + right)
+                }
+            }
+            arr.push(temp)
+            sub(++row, numRows, arr)
+            return arr
+        } else {
+            return arr
+        }
+    }
+    return sub(0, numRows, res)
+};
+```
+
+结果：
+
+- 15/15 cases passed (64 ms)
+- Your runtime beats 68.27 % of javascript submissions
+- Your memory usage beats 56.86 % of javascript submissions (33.6 MB)
+- 时间复杂度 `O(n^2)`
+
+**Ⅱ.二项式定理**
+
+优势在于可以直接计算第n行，用二项式定理公式计算。 `(a+b)^n` 一共有n+1项，每一项的系数对应杨辉三角的第 n 行。第 r 项的系数等于 组合数 `C(n,r)` 。
+
+代码：
+
+```javascript
+/**
+ * @param {number} numRows
+ * @return {number[][]}
+ */
+var generate = function(numRows) {
+    var res = [];
+
+    /**
+     * 组合数
+     * @param n
+     * @param r
+     * @returns {number}
+     * @constructor
+     */
+    function C(n, r) {
+        if(n == 0) return 1;
+        return F(n) / F(r) / F(n - r);
+    }
+    /**
+     * 阶乘
+     * @param n
+     * @returns {number}
+     * @constructor
+     */
+    function F(n) {
+        var s = 1;
+        for(var i = 1;i <= n;i++) {
+            s *= i;
+        }
+        return s;
+    }
+
+    for (var i = 0;i < numRows;i++){
+        res[i] = [];
+        for (var j = 0;j < i + 1;j++){
+            res[i].push(C(i, j));
+        }
+    }
+    return res;
+};
+```
+
+结果：
+
+- 15/15 cases passed (64 ms)
+- Your runtime beats 68.27 % of javascript submissions
+- Your memory usage beats 5.02 % of javascript submissions (34.3 MB)
+- 时间复杂度 `O(n^2)`
+
+#### 思考总结
+
+对于数学敏感的开发者，很容易就想到使用二项式定理。但是在我看来，找到了一个计算规则，就很容易想到使用动态规划来解决问题，我也推荐使用动态规划来生成杨辉三角。
