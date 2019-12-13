@@ -38,6 +38,7 @@
 - [111.二叉树的最小深度](#111二叉树的最小深度)
 - [112.路径总和](#112路径总和)
 - [118.杨辉三角](#118杨辉三角)
+- [119.杨辉三角Ⅱ](#119杨辉三角Ⅱ)
 
 ## Easy
 
@@ -5006,6 +5007,8 @@ var hasPathSum = function(root, sum) {
 
 这道题最笨的方案就是双重循环，首尾为1，其他位为 `S(l)[n] = S(l-1)[n-1] + S(l-1)[n]` 。当然这里很明显也可以当做一个动态规划问题来解答。
 
+> 这里有个坑，给的是索引，不是第 n 行
+
 #### 编写代码验证
 
 **Ⅰ.动态规划**
@@ -5143,3 +5146,157 @@ var generate = function(numRows) {
 #### 思考总结
 
 对于数学敏感的开发者，很容易就想到使用二项式定理。但是在我看来，找到了一个计算规则，就很容易想到使用动态规划来解决问题，我也推荐使用动态规划来生成杨辉三角。
+
+### 119.杨辉三角Ⅱ
+
+[题目地址](https://leetcode-cn.com/problems/pascals-triangle-ii/)
+
+#### 题目描述
+
+给定一个非负索引 k，其中 k ≤ 33，返回杨辉三角的第 k 行。
+
+在杨辉三角中，每个数是它左上方和右上方的数的和。
+
+示例:
+
+```javascript
+输入: 3
+输出: [1,3,3,1]
+```
+
+进阶：
+
+你可以优化你的算法到 O(k) 空间复杂度吗？
+
+#### 题目分析设想
+
+上面从他人解法中发现了二项式定理可以直接求第 n 行。另外我们也可以发现个规律，第几行实际上就有几个数，且首尾为1。当然也可以使用动态规划来作答。
+
+#### 编写代码验证
+
+**Ⅰ.动态规划**
+
+代码：
+
+```javascript
+/**
+ * @param {number} rowIndex
+ * @return {number[]}
+ */
+var getRow = function(rowIndex) {
+    // rowIndex 是索引，0相当于第1行
+    if (rowIndex === 0) return [1]
+    let res = []
+    for(let i = 0; i < rowIndex + 1; i++) {
+        let temp = new Array(i+1).fill(1)
+        // 第三行开始才需要修改
+        for(let j = 1; j < i; j++) {
+            temp[j] = res[j - 1] + res[j]
+        }
+        res = temp
+    }
+    return res
+};
+```
+
+结果：
+
+- 34/34 cases passed (64 ms)
+- Your runtime beats 75.77 % of javascript submissions
+- Your memory usage beats 54.9 % of javascript submissions (33.8 MB)
+- 时间复杂度 `O(n^2)`
+
+**Ⅱ.二项式定理**
+
+代码：
+
+```javascript
+/**
+ * @param {number} rowIndex
+ * @return {number[]}
+ */
+var getRow = function(rowIndex) {
+    /**
+     * 组合数
+     * @param n
+     * @param r
+     * @returns {number}
+     * @constructor
+     */
+    function C(n, r) {
+        if(n == 0) return 1;
+        return F(n) / F(r) / F(n - r);
+    }
+    /**
+     * 阶乘
+     * @param n
+     * @returns {number}
+     * @constructor
+     */
+    function F(n) {
+        var s = 1;
+        for(var i = 1;i <= n;i++) {
+            s *= i;
+        }
+        return s;
+    }
+    let res = []
+    // 因为是通过上一项计算，所以第1项的 n 为0
+    for (var i = 0;i < rowIndex + 1;i++){
+        res.push(C(rowIndex, i));
+    }
+    return res;
+};
+```
+
+结果：
+
+- 34/34 cases passed (52 ms)
+- Your runtime beats 99.12 % of javascript submissions
+- Your memory usage beats 41.18 % of javascript submissions (34.5 MB)
+- 时间复杂度 `O(n)`
+
+#### 查阅他人解法
+
+因为发现每行的对称性，所以也可以求一半后反转复制即可。
+
+**Ⅰ.反转复制**
+
+代码：
+
+```javascript
+/**
+ * @param {number} rowIndex
+ * @return {number[]}
+ */
+var getRow = function(rowIndex) {
+    // rowIndex 是索引，0相当于第1行
+    if (rowIndex === 0) return [1]
+    let res = []
+    for(let i = 0; i < rowIndex + 1; i++) {
+        let temp = new Array(i+1).fill(1)
+        // 第三行开始才需要修改
+        const mid = i >>> 1
+        for(let j = 1; j < i; j++) {
+            if (j > mid) {
+                temp[j] = temp[i - j]
+            } else {
+                temp[j] = res[j - 1] + res[j]
+            }
+        }
+        res = temp
+    }
+    return res
+};
+```
+
+结果：
+
+- 34/34 cases passed (60 ms)
+- Your runtime beats 88.47 % of javascript submissions
+- Your memory usage beats 60.78 % of javascript submissions (33.7 MB)
+- 时间复杂度 `O(n^2)`
+
+#### 思考总结
+
+其实更像一个数学问题，不断地找出规律来节省运算，真是“学好数理化，走遍天下都不怕”。
