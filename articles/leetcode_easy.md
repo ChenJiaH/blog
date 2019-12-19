@@ -39,6 +39,7 @@
 - [112.路径总和](#112路径总和)
 - [118.杨辉三角](#118杨辉三角)
 - [119.杨辉三角Ⅱ](#119杨辉三角Ⅱ)
+- [121.买卖股票的最佳时机](#121买卖股票的最佳时机)
 
 ## Easy
 
@@ -5300,3 +5301,178 @@ var getRow = function(rowIndex) {
 #### 思考总结
 
 其实更像一个数学问题，不断地找出规律来节省运算，真是“学好数理化，走遍天下都不怕”。
+
+### 121.买卖股票的最佳时机
+
+[题目地址](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock/)
+
+#### 题目描述
+
+给定一个数组，它的第 i 个元素是一支给定股票第 i 天的价格。
+
+如果你最多只允许完成一笔交易（即买入和卖出一支股票），设计一个算法来计算你所能获取的最大利润。
+
+注意你不能在买入股票前卖出股票。
+
+示例 1:
+
+```javascript
+输入: [7,1,5,3,6,4]
+输出: 5
+解释: 在第 2 天（股票价格 = 1）的时候买入，在第 5 天（股票价格 = 6）的时候卖出，最大利润 = 6-1 = 5 。
+     注意利润不能是 7-1 = 6, 因为卖出价格需要大于买入价格。
+```
+
+示例 2:
+
+```javascript
+输入: [7,6,4,3,1]
+输出: 0
+解释: 在这种情况下, 没有交易完成, 所以最大利润为 0。
+```
+
+#### 题目分析设想
+
+这道题，我的第一反应有点像求最大子序和，只不过这里不是求连续，是求单个，转换为增益的思想来处理。当然也可以使用两次遍历的笨办法来求解。我们分别来验证一下。
+
+#### 编写代码验证
+
+**Ⅰ.两次遍历**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} prices
+ * @return {number}
+ */
+var maxProfit = function(prices) {
+    if (prices.length < 2) return 0
+    // 因为是利润，所以不考虑负数
+    let profit = 0
+    for(let i = 0; i < prices.length; i++) {
+        for(let j = i + 1; j < prices.length; j++) {
+            profit = Math.max(prices[j] - prices[i], profit)
+        }
+    }
+    return profit
+};
+```
+
+结果：
+
+- 200/200 cases passed (384 ms)
+- Your runtime beats 25.89 % of javascript submissions
+- Your memory usage beats 19.85 % of javascript submissions (35.9 MB)
+- 时间复杂度 `O(n^2)`
+
+**Ⅱ.增益思想**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} prices
+ * @return {number}
+ */
+var maxProfit = function(prices) {
+    if (prices.length < 2) return 0
+    // 因为是利润，所以不考虑负数
+    let profit = 0
+    let last = 0
+    for(let i = 0; i < prices.length - 1; i++) {
+        // 这里其实可以转换为每两项价格相减后，再求最大子序和
+        // prices[i + 1] - prices[i] 就是增益，和0比较是因为求利润，不是求连续和
+        last = Math.max(0, last + prices[i + 1] - prices[i])
+        profit = Math.max(profit, last)
+    }
+    return profit
+};
+```
+
+结果：
+
+- 200/200 cases passed (64 ms)
+- Your runtime beats 94.53 % of javascript submissions
+- Your memory usage beats 19.85 % of javascript submissions (35.9 MB)
+- 时间复杂度 `O(n)`
+
+#### 查阅他人解法
+
+这里看到两种不同的思考，一种是理解为波峰和波谷，找到波谷后的下一个波峰，判断每个波峰与波谷差值的大小。另外一种是基于状态机的动态规划，也就是说把可能性都前置运算后，再进行比较。
+
+**Ⅰ.波峰波谷**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} prices
+ * @return {number}
+ */
+var maxProfit = function(prices) {
+    if (prices.length < 2) return 0
+    // 波谷
+    let min = Infinity
+    // 因为是利润，所以不考虑负数
+    let profit = 0
+    for(let i = 0; i < prices.length; i++) {
+        if (prices[i] < min) {
+            min = prices[i]
+        } else if (prices[i] - min > profit) {
+            // 这里是当前这个波峰和波谷的差值与历史的进行比较
+            profit = prices[i] - min
+        }
+    }
+    return profit
+};
+```
+
+结果：
+
+- 200/200 cases passed (68 ms)
+- Your runtime beats 86.75 % of javascript submissions
+- Your memory usage beats 21.34 % of javascript submissions (35.8 MB)
+- 时间复杂度 `O(n)`
+
+**Ⅱ.动态规划**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} prices
+ * @return {number}
+ */
+var maxProfit = function(prices) {
+    if (prices.length < 2) return 0
+    // 动态初始数组
+    let dp = new Array(prices.length).fill([])
+    // 0：用户手上不持股所能获得的最大利润，特指卖出股票以后的不持股，非指没有进行过任何交易的不持股
+    // 1：用户手上持股所能获得的最大利润
+    // 状态 dp[i][0] 表示：在索引为 i 的这一天，用户手上不持股所能获得的最大利润
+    // 状态 dp[i][1] 表示：在索引为 i 的这一天，用户手上持股所能获得的最大利润
+    // -prices[i] 就表示，在索引为 i 的这一天，执行买入操作得到的收益
+    dp[0][0] = 0
+    dp[0][1] = -prices[0]
+
+    for(let i = 1; i < prices.length; i++) {
+        dp[i][0] = Math.max(dp[i - 1][0], dp[i - 1][1] + prices[i])
+        dp[i][1] = Math.max(dp[i - 1][1], -prices[i])
+    }
+    return dp[prices.length - 1][0]
+};
+```
+
+结果：
+
+- 200/200 cases passed (72 ms)
+- Your runtime beats 75.01 % of javascript submissions
+- Your memory usage beats 12.43 % of javascript submissions (36.7 MB)
+- 时间复杂度 `O(n)`
+
+这个思路还有一系列的优化过程，可以[点击这里查看](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock/solution/bao-li-mei-ju-dong-tai-gui-hua-chai-fen-si-xiang-b/)
+
+#### 思考总结
+
+很多问题都可以转换成动态规划的思想来解决，但是我这里还是更推荐使用增益思想，也可以理解为差分数组。但是如果题目允许多次买入卖出，我会更推荐使用动态规划来解决问题。
