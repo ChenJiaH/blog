@@ -40,6 +40,7 @@
 - [118.杨辉三角](#118杨辉三角)
 - [119.杨辉三角Ⅱ](#119杨辉三角Ⅱ)
 - [121.买卖股票的最佳时机](#121买卖股票的最佳时机)
+- [122.买卖股票的最佳时机Ⅱ](#122买卖股票的最佳时机Ⅱ)
 
 ## Easy
 
@@ -5476,3 +5477,231 @@ var maxProfit = function(prices) {
 #### 思考总结
 
 很多问题都可以转换成动态规划的思想来解决，但是我这里还是更推荐使用增益思想，也可以理解为差分数组。但是如果题目允许多次买入卖出，我会更推荐使用动态规划来解决问题。
+
+### 122.买卖股票的最佳时机Ⅱ
+
+[题目地址](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-ii/)
+
+#### 题目描述
+
+给定一个数组，它的第 i 个元素是一支给定股票第 i 天的价格。
+
+设计一个算法来计算你所能获取的最大利润。你可以尽可能地完成更多的交易（多次买卖一支股票）。
+
+注意：你不能同时参与多笔交易（你必须在再次购买前出售掉之前的股票）。
+
+示例 1:
+
+```javascript
+输入: [7,1,5,3,6,4]
+输出: 7
+解释: 在第 2 天（股票价格 = 1）的时候买入，在第 3 天（股票价格 = 5）的时候卖出, 这笔交易所能获得利润 = 5-1 = 4 。
+     随后，在第 4 天（股票价格 = 3）的时候买入，在第 5 天（股票价格 = 6）的时候卖出, 这笔交易所能获得利润 = 6-3 = 3 。
+```
+
+示例 2:
+
+```javascript
+输入: [1,2,3,4,5]
+输出: 4
+解释: 在第 1 天（股票价格 = 1）的时候买入，在第 5 天 （股票价格 = 5）的时候卖出, 这笔交易所能获得利润 = 5-1 = 4 。
+     注意你不能在第 1 天和第 2 天接连购买股票，之后再将它们卖出。
+     因为这样属于同时参与了多笔交易，你必须在再次购买前出售掉之前的股票。
+```javascript
+
+示例 3:
+
+```javascript
+输入: [7,6,4,3,1]
+输出: 0
+解释: 在这种情况下, 没有交易完成, 所以最大利润为 0。
+```
+
+#### 题目分析设想
+
+上面刚刚做了算最大收益的，这题明显是算累计收益的，所以可以按以下几个方向：
+
+- 一次遍历，直接遍历，不断比较前后两天价格，如果后一天收益高，则差值加到利润，可以理解为贪心算法。
+- 波峰波谷，找到所有波峰波谷，差值相加即可
+- 动态规划
+
+#### 编写代码验证
+
+**Ⅰ.一次遍历**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} prices
+ * @return {number}
+ */
+var maxProfit = function(prices) {
+    let profit = 0
+    for(let i = 1; i < prices.length; i++) {
+        if (prices[i] > prices[i - 1]) {
+            profit += prices[i] - prices[i - 1]
+        }
+    }
+    return profit
+};
+```
+
+结果：
+
+- 201/201 cases passed (68 ms)
+- Your runtime beats 77.02 % of javascript submissions
+- Your memory usage beats 13.55 % of javascript submissions (35.7 MB)
+- 时间复杂度 `O(n)`
+
+**Ⅱ.波峰波谷**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} prices
+ * @return {number}
+ */
+var maxProfit = function(prices) {
+    if (!prices.length) return 0
+    let profit = 0
+    // 波峰波谷
+    let min = max = prices[0]
+    let i = 0
+    while (i < prices.length - 1) {
+        while(prices[i] >= prices[i + 1]) {
+            i++
+        }
+        min = prices[i]
+        while(prices[i] <= prices[i + 1]) {
+            i++
+        }
+        max = prices[i]
+        profit += max - min
+    }
+    return profit
+};
+```
+
+结果：
+
+- 201/201 cases passed (68 ms)
+- Your runtime beats 77.02 % of javascript submissions
+- Your memory usage beats 14.4 % of javascript submissions (35.7 MB)
+- 时间复杂度 `O(n)`
+
+**Ⅲ.动态规划**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} prices
+ * @return {number}
+ */
+var maxProfit = function(prices) {
+    if (prices.length < 2) return 0
+    // 动态初始数组
+    let dp = new Array(prices.length).fill([])
+    // 0：用户手上不持股所能获得的最大利润，特指卖出股票以后的不持股，非指没有进行过任何交易的不持股
+    // 1：用户手上持股所能获得的最大利润
+    // 状态 dp[i][0] 表示：在索引为 i 的这一天，用户手上不持股所能获得的最大利润
+    // 状态 dp[i][1] 表示：在索引为 i 的这一天，用户手上持股所能获得的最大利润
+    // -prices[i] 就表示，在索引为 i 的这一天，执行买入操作得到的收益
+    dp[0][0] = 0
+    dp[0][1] = -prices[0]
+
+    for(let i = 1; i < prices.length; i++) {
+        dp[i][0] = Math.max(dp[i - 1][0], dp[i - 1][1] + prices[i])
+        dp[i][1] = Math.max(dp[i - 1][1], dp[i][0] - prices[i])
+    }
+    return dp[prices.length - 1][0]
+};
+```
+
+结果：
+
+- 201/201 cases passed (76 ms)
+- Your runtime beats 37.68 % of javascript submissions
+- Your memory usage beats 5.13 % of javascript submissions (36.7 MB)
+- 时间复杂度 `O(n)`
+
+#### 查阅他人解法
+
+这里看到了动态规划的优化版，主要是降低空间复杂度。其他的思路都区别不大。
+
+**Ⅰ.动态规划优化版**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} prices
+ * @return {number}
+ */
+var maxProfit = function(prices) {
+    if (prices.length < 2) return 0
+    // cash 表示持有现金
+    // hold 表示持有股票
+    let cash = new Array(prices.length).fill(null)
+    let hold = new Array(prices.length).fill(null)
+
+    cash[0] = 0
+    hold[0] = -prices[0]
+
+    for(let i = 1; i < prices.length; i++) {
+        cash[i] = Math.max(cash[i - 1], hold[i - 1] + prices[i])
+        hold[i] = Math.max(hold[i - 1], cash[i - 1] - prices[i])
+    }
+    return cash[prices.length - 1]
+};
+```
+
+结果：
+
+- 201/201 cases passed (68 ms)
+- Your runtime beats 77.02 % of javascript submissions
+- Your memory usage beats 9.7 % of javascript submissions (36 MB)
+- 时间复杂度 `O(n)`
+
+**还可以进一步进行状态压缩**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} prices
+ * @return {number}
+ */
+var maxProfit = function(prices) {
+    if (prices.length < 2) return 0
+    // cash 表示持有现金
+    // hold 表示持有股票
+    // 加了两个变量来存储上一次的值
+    let cash = tempCash = 0
+    let hold = tempHold = -prices[0]
+
+    for(let i = 1; i < prices.length; i++) {
+        cash = Math.max(tempCash, tempHold + prices[i])
+        hold = Math.max(tempHold, tempCash - prices[i])
+
+        tempCash = cash
+        tempHold = hold
+    }
+    return tempCash
+};
+```
+
+结果：
+
+- 201/201 cases passed (72 ms)
+- Your runtime beats 58.45 % of javascript submissions
+- Your memory usage beats 10.55 % of javascript submissions (35.8 MB)
+- 时间复杂度 `O(n)`
+
+#### 思考总结
+
+就这道题而言，我会推荐使用一次遍历的方式，也就是贪心算法，理解起来会十分清晰。当然，动态规划的解决范围更广，基本上可以解决这类型的所有题目。增益也是一个比较常见的手段。总体而言，这两道股票题还比较简单。
+
+
