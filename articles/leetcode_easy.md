@@ -41,6 +41,7 @@
 - [119.杨辉三角Ⅱ](#119杨辉三角Ⅱ)
 - [121.买卖股票的最佳时机](#121买卖股票的最佳时机)
 - [122.买卖股票的最佳时机Ⅱ](#122买卖股票的最佳时机Ⅱ)
+- [125.验证回文串](#125验证回文串)
 
 ## Easy
 
@@ -5704,4 +5705,206 @@ var maxProfit = function(prices) {
 
 就这道题而言，我会推荐使用一次遍历的方式，也就是贪心算法，理解起来会十分清晰。当然，动态规划的解决范围更广，基本上可以解决这类型的所有题目。增益也是一个比较常见的手段。总体而言，这两道股票题还比较简单。
 
+### 125.验证回文串
 
+[题目地址](https://leetcode-cn.com/problems/valid-palindrome/)
+
+#### 题目描述
+
+给定一个字符串，验证它是否是回文串，只考虑字母和数字字符，可以忽略字母的大小写。
+
+说明：本题中，我们将空字符串定义为有效的回文串。
+
+示例:
+
+```javascript
+输入: "A man, a plan, a canal: Panama"
+输出: true
+
+输入: "race a car"
+输出: false
+```
+
+#### 题目分析设想
+
+这道题我有两个方向，一是改变原输入串，二是不改变原输入串。
+
+- 改变原输入串，可以去掉非字母和数字的字符后，反转判断或者双指针判断或者单指针
+- 不改变原输入串，直接双指针判断
+
+主要作答方法就是反转判断，双指针法以及二分法。
+
+#### 编写代码验证
+
+**Ⅰ.反转判断**
+
+代码：
+
+```javascript
+/**
+ * @param {string} s
+ * @return {boolean}
+ */
+var isPalindrome = function(s) {
+    // 正则去除不满足条件的字符
+    let str = s.toLowerCase().replace(/[^0-9a-z]/g, '')
+    return str === str.split('').reverse().join('')
+};
+```
+
+结果：
+
+- 476/476 cases passed (72 ms)
+- Your runtime beats 95.33 % of javascript submissions
+- Your memory usage beats 47.7 % of javascript submissions (38.1 MB)
+- 时间复杂度： `O(1)`
+
+**Ⅱ.双指针法（预处理字符）**
+
+代码：
+
+```javascript
+/**
+ * @param {string} s
+ * @return {boolean}
+ */
+var isPalindrome = function(s) {
+    // 正则去除不满足条件的字符
+    let str = s.toLowerCase().replace(/[^0-9a-z]/g, '')
+    let len = str.length
+    let l = 0
+    let r = len - 1
+    while(l < r) {
+        if (str.charAt(l) !== str.charAt(r)) {
+            return false
+        }
+        l++
+        r--
+    }
+    return true
+};
+```
+
+结果：
+
+- 476/476 cases passed (76 ms)
+- Your runtime beats 89.25 % of javascript submissions
+- Your memory usage beats 70.96 % of javascript submissions (37.4 MB)
+- 时间复杂度： `O(n)`
+
+**Ⅲ.单指针法（预处理字符）**
+
+代码：
+
+```javascript
+/**
+ * @param {string} s
+ * @return {boolean}
+ */
+var isPalindrome = function(s) {
+    // 正则去除不满足条件的字符
+    let str = s.toLowerCase().replace(/[^0-9a-z]/g, '')
+    let len = str.length
+    // 最多需要判断的次数
+    let max = len >>> 1
+    let i = 0
+    while(i < max) {
+        if (len % 2) { // 奇数
+            if (str.charAt(max - i - 1) !== str.charAt(max + i + 1)) {
+                return false
+            }
+        } else { // 偶数
+            if (str.charAt(max - i - 1) !== str.charAt(max + i)) {
+                return false
+            }
+        }
+        i++
+    }
+    return true
+};
+```
+
+结果：
+
+- 476/476 cases passed (72 ms)
+- Your runtime beats 95.33 % of javascript submissions
+- Your memory usage beats 56.02 % of javascript submissions (38 MB)
+- 时间复杂度： `O(n)`
+
+**Ⅳ.双指针法**
+
+代码：
+
+```javascript
+/**
+ * @param {string} s
+ * @return {boolean}
+ */
+var isPalindrome = function(s) {
+    let len = s.length
+    let l = 0
+    let r = len - 1
+    while (l < r) {
+        if (!/[0-9a-zA-Z]/.test(s.charAt(l))) {
+            l++
+        } else if (!/[0-9a-zA-Z]/.test(s.charAt(r))) {
+            r--
+        } else {
+            if(s.charAt(l).toLowerCase() !== s.charAt(r).toLowerCase()) {
+                return false
+            }
+            l++
+            r--
+        }
+
+    }
+    return true
+};
+```
+
+结果：
+
+- 476/476 cases passed (76 ms)
+- Your runtime beats 89.25 % of javascript submissions
+- Your memory usage beats 13.06 % of javascript submissions (42 MB)
+- 时间复杂度： `O(n)`
+
+#### 查阅他人解法
+
+这里看到一种利用栈的思路，先进后出，推一半入栈然后进行比较。
+
+**Ⅰ.利用栈**
+
+代码：
+
+```javascript
+/**
+ * @param {string} s
+ * @return {boolean}
+ */
+var isPalindrome = function(s) {
+    // 正则去除不满足条件的字符
+    let str = s.toLowerCase().replace(/[^0-9a-z]/g, '')
+    let mid = str.length >>> 1
+    let stack = str.substr(0, mid).split('')
+    // 起始位置如果字符个数为奇数则跳过中间位
+    for(let i = str.length % 2 ? mid + 1 : mid; i < str.length; i++) {
+        const last = stack.pop()
+        if (last !== str.charAt(i)) {
+            return false
+        }
+    }
+    return true
+};
+```
+
+结果：
+
+- 476/476 cases passed (84 ms)
+- Your runtime beats 65.67 % of javascript submissions
+- Your memory usage beats 71.81 % of javascript submissions (37.4 MB)
+- 时间复杂度： `O(n)`
+
+#### 思考总结
+
+总体而言，判断回文字符或者相关的题目，我更推荐采用双指针法，思路非常清晰。这里头尾递归比较也可以作答，就不在这里列举了。
