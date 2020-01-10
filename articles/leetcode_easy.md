@@ -42,6 +42,7 @@
 - [121.买卖股票的最佳时机](#121买卖股票的最佳时机)
 - [122.买卖股票的最佳时机Ⅱ](#122买卖股票的最佳时机Ⅱ)
 - [125.验证回文串](#125验证回文串)
+- [136.只出现一次的数字](#136只出现一次的数字)
 
 ## Easy
 
@@ -5908,3 +5909,104 @@ var isPalindrome = function(s) {
 #### 思考总结
 
 总体而言，判断回文字符或者相关的题目，我更推荐采用双指针法，思路非常清晰。这里头尾递归比较也可以作答，就不在这里列举了。
+
+### 136.只出现一次的数字
+
+[题目地址](https://leetcode-cn.com/problems/single-number/)
+
+#### 题目描述
+
+给定一个非空整数数组，除了某个元素只出现一次以外，其余每个元素均出现两次。找出那个只出现了一次的元素。
+
+说明：
+
+你的算法应该具有线性时间复杂度。 你可以不使用额外空间来实现吗？
+
+```javascript
+输入: [2,2,1]
+输出: 1
+
+输入: [4,1,2,1,2]
+输出: 4
+``
+
+#### 题目分析设想
+
+这题说明了线性时间复杂度，所以最多一次遍历。很容易想到用 Hash 表或者其他方式对各数字出现次数做个统计来求解，但是需要考虑如何不适用额外空间。这里很明显就指向了离散数学中的异或运算。
+
+- Hash 法，需要额外 `O(n)` 的空间
+- 异或运算
+
+#### 编写代码验证
+
+**Ⅰ.Hash 法**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var singleNumber = function(nums) {
+    let hash = {}
+    for(let i = 0; i < nums.length; i++) {
+        if (hash[nums[i]]) {
+            hash[nums[i]] = false
+        } else if (hash[nums[i]] === undefined) {
+            hash[nums[i]] = true
+        }
+    }
+    for(let i in hash) {
+        if(hash[i]) {
+            return parseInt(i)
+        }
+    }
+};
+```
+
+结果：
+
+- 16/16 cases passed (72 ms)
+- Your runtime beats 68.39 % of javascript submissions
+- Your memory usage beats 5.49 % of javascript submissions (38.6 MB)
+- 时间复杂度： `O(n)`
+
+**Ⅱ.异或运算**
+
+简单列一下几条运算规则，利用这规则，发现很容易作答这道题。
+
+- 交换律： a^b^c = a^c^b
+- 任何数和 0 异或为本身：a^0 = a
+- 相同的数异或为 0：a^a = 0
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var singleNumber = function(nums) {
+    let n = 0
+    for(let i = 0; i < nums.length; i++) {
+        n ^= nums[i]
+    }
+    return n
+};
+```
+
+结果：
+
+- 16/16 cases passed (60 ms)
+- Your runtime beats 95.77 % of javascript submissions
+- Your memory usage beats 74.07 % of javascript submissions (35.3 MB)
+- 时间复杂度： `O(n)`
+
+#### 查阅他人解法
+
+没有发现其他不同方向的解法。
+
+#### 思考总结
+
+这里的话第一想法大多都是借助哈希表来实现，但是由于有补充说明，所以更推荐使用异或算法。纯粹是数学公式的应用场景之一，没有什么太多好总结的地方。
