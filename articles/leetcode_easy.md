@@ -43,6 +43,7 @@
 - [122.买卖股票的最佳时机Ⅱ](#122买卖股票的最佳时机Ⅱ)
 - [125.验证回文串](#125验证回文串)
 - [136.只出现一次的数字](#136只出现一次的数字)
+- [141.环形链表](#141环形链表)
 
 ## Easy
 
@@ -6010,3 +6011,184 @@ var singleNumber = function(nums) {
 #### 思考总结
 
 这里的话第一想法大多都是借助哈希表来实现，但是由于有补充说明，所以更推荐使用异或算法。纯粹是数学公式的应用场景之一，没有什么太多好总结的地方。
+
+### 141.环形链表
+
+[题目地址](https://leetcode-cn.com/problems/linked-list-cycle/)
+
+#### 题目描述
+
+给定一个链表，判断链表中是否有环。
+
+为了表示给定链表中的环，我们使用整数 pos 来表示链表尾连接到链表中的位置（索引从 0 开始）。 如果 pos 是 -1，则在该链表中没有环。
+
+```javascript
+示例 1：
+输入：head = [3,2,0,-4], pos = 1
+输出：true
+解释：链表中有一个环，其尾部连接到第二个节点。
+
+示例 2：
+输入：head = [1,2], pos = 0
+输出：true
+解释：链表中有一个环，其尾部连接到第一个节点。
+
+示例 3：
+输入：head = [1], pos = -1
+输出：false
+解释：链表中没有环。
+```
+
+进阶：
+
+你能用 O(1)（即，常量）内存解决此问题吗？
+
+#### 题目分析设想
+
+这道题的本质其实就是对象的比较，而对应的相等应当是引用同样的内存，可以想象成数组中找到同样的元素。所以第一个想法就是哈希表，当然也可以使用快慢指针来做处理。由于哈希表需要额外的内存，所以可以做优化，比如直接改变原对象，做特殊标识或者其他方式。
+
+- 哈希表，直接利用哈希表存储，也可以使用 Map/Set 等等，直接判断对象相等即可
+- 特殊标识，哈希表需要额外空间，可以直接在原对象上打标识，或者置为空等等特殊标识均可
+- 双指针法，一快一慢，如果是环，那必然会存在相等的时候，如果不是环，那快的先走完
+
+#### 编写代码验证
+
+**Ⅰ.哈希表**
+
+代码：
+
+```javascript
+/**
+ * @param {ListNode} head
+ * @return {boolean}
+ */
+var hasCycle = function(head) {
+    let hashArr = []
+    // val 可能为 0 ,所以不能直接 ！head
+    while (head !== null) {
+        if (hashArr.includes(head)) {
+            return true
+        } else {
+            hashArr.push(head)
+            head = head.next
+        }
+    }
+    return false
+};
+```
+
+结果：
+
+- 17/17 cases passed (116 ms)
+- Your runtime beats 12.03 % of javascript submissions
+- Your memory usage beats 5.05 % of javascript submissions (38.5 MB)
+- 时间复杂度： `O(n)`
+
+**Ⅱ.特殊标识法**
+
+代码：
+
+```javascript
+/**
+ * @param {ListNode} head
+ * @return {boolean}
+ */
+var hasCycle = function(head) {
+    while (head && head.next) {
+        if (head.FLAG) {
+            return true
+        } else {
+            head.FLAG = true
+            head = head.next
+        }
+    }
+    return false
+};
+```
+
+结果：
+
+- 17/17 cases passed (76 ms)
+- Your runtime beats 78.6 % of javascript submissions
+- Your memory usage beats 16.32 % of javascript submissions (37.5 MB)
+- 时间复杂度： `O(n)`
+
+**Ⅲ.双指针法**
+
+代码：
+
+```javascript
+/**
+ * @param {ListNode} head
+ * @return {boolean}
+ */
+var hasCycle = function(head) {
+    if (head && head.next) {
+        let slow = head
+        let fast = head.next
+        while(slow !== fast) {
+            if (fast && fast.next) {
+                // 快指针需要比慢指针移动速度快，才能追上，所以是 .next.next
+                fast = fast.next.next
+                slow = slow.next
+            } else {
+                // 快指针走到头了，所以必然不是环
+                return false
+            }
+        }
+        return true
+    } else {
+        return false
+    }
+};
+```
+
+结果：
+
+- 17/17 cases passed (76 ms)
+- Your runtime beats 78.6 % of javascript submissions
+- Your memory usage beats 56.97 % of javascript submissions (36.6 MB)
+- 时间复杂度： `O(n)`
+
+#### 查阅他人解法
+
+这里发现一个有意思的思路，通过链路导致。如果是环，那么倒置后的尾节点等于倒置前的头节点。如果不是环，那么就是正常的倒置不相等。
+
+**Ⅰ.倒置法**
+
+代码：
+
+```javascript
+/**
+ * @param {ListNode} head
+ * @return {boolean}
+ */
+var hasCycle = function(head) {
+    if (head === null || head.next === null) return false
+    if (head === head.next) return true
+    let p = head.next
+    let q = p.next
+    let x = head
+    head.next = null
+    // 相当于每遍历一个链表，就把后面的指向前面一项，这样当循环的时候，会反方向走出环形
+    while(q !== null) {
+        p.next = x
+        x = p
+        p = q
+        q = q.next
+    }
+    return p === head
+};
+```
+
+结果：
+
+- 17/17 cases passed (72 ms)
+- Your runtime beats 90.05 % of javascript submissions
+- Your memory usage beats 35.91 % of javascript submissions (36.8 MB)
+- 时间复杂度： `O(n)`
+
+#### 思考总结
+
+一般去重或者找到重复项用哈希的方式都能解决，但是在这题里，题目期望空间复杂度是 `O(1)`，要么是改变原数据本身，要么是使用双指针法。这里我比较推荐双指针法，当然倒置法也比较巧妙。
+
