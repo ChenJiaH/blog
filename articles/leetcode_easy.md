@@ -44,6 +44,7 @@
 - [125.验证回文串](#125验证回文串)
 - [136.只出现一次的数字](#136只出现一次的数字)
 - [141.环形链表](#141环形链表)
+- [155.最小栈](#155最小栈)
 
 ## Easy
 
@@ -6192,3 +6193,227 @@ var hasCycle = function(head) {
 
 一般去重或者找到重复项用哈希的方式都能解决，但是在这题里，题目期望空间复杂度是 `O(1)`，要么是改变原数据本身，要么是使用双指针法。这里我比较推荐双指针法，当然倒置法也比较巧妙。
 
+### 155.最小栈
+
+[题目地址](https://leetcode-cn.com/problems/min-stack/)
+
+#### 题目描述
+
+设计一个支持 push，pop，top 操作，并能在常数时间内检索到最小元素的栈。
+
+* push(x) -- 将元素 x 推入栈中。
+* pop() -- 删除栈顶的元素。
+* top() -- 获取栈顶元素。
+* getMin() -- 检索栈中的最小元素。
+
+示例：
+
+```javascript
+MinStack minStack = new MinStack();
+minStack.push(-2);
+minStack.push(0);
+minStack.push(-3);
+minStack.getMin();   --> 返回 -3.
+minStack.pop();
+minStack.top();      --> 返回 0.
+minStack.getMin();   --> 返回 -2.
+```
+
+#### 题目分析设想
+
+这道题感觉就是构造函数，仅此而已，给函数的原型加一些方法。差异就在方法实现本身上，这个就写一个个人的思路吧，内部维护每次操作后的最小值数组。当然用差值数组和最小值也是可以的。
+
+#### 编写代码验证
+
+**Ⅰ.内部维护最小值数组**
+
+代码：
+
+```javascript
+/**
+ * initialize your data structure here.
+ */
+var MinStack = function() {
+    // 栈内数据用数组存储
+    this.stacks = []
+    this.mins = []
+};
+
+/**
+ * @param {number} x
+ * @return {void}
+ */
+MinStack.prototype.push = function(x) {
+    this.stacks.push(x)
+    // 比当前最小值小的数都需要存住
+    if (!this.mins.length || this.mins[this.mins.length - 1] >= x) {
+        this.mins.push(x)
+    }
+};
+
+/**
+ * @return {void}
+ */
+MinStack.prototype.pop = function() {
+    // 如果推出的是最小值，那最小值数组也同步更新即可
+    if (this.stacks.pop() === this.mins[this.mins.length - 1]) {
+        this.mins.pop()
+    }
+};
+
+/**
+ * @return {number}
+ */
+MinStack.prototype.top = function() {
+    return this.stacks.length ? this.stacks[this.stacks.length - 1] : undefined
+};
+
+/**
+ * @return {number}
+ */
+MinStack.prototype.getMin = function() {
+    return this.mins[this.mins.length - 1]
+};
+```
+
+结果：
+
+- 18/18 cases passed (116 ms)
+- Your runtime beats 89.63 % of javascript submissions
+- Your memory usage beats 7.49 % of javascript submissions (44.9 MB)
+- 时间复杂度： `O(1)`
+
+**Ⅱ.差值数组和最小值**
+
+代码：
+
+```javascript
+/**
+ * initialize your data structure here.
+ */
+var MinStack = function() {
+    // 栈内数据用数组存储
+    this.stacks = []
+    this.min = Infinity
+};
+
+/**
+ * @param {number} x
+ * @return {void}
+ */
+MinStack.prototype.push = function(x) {
+    if (!this.stacks.length) {
+        this.min = x
+        // x - this.min = 0
+        this.stacks.push(0)
+    } else {
+        // 先存差值再更新最小值
+        this.stacks.push(x - this.min)
+        if (x < this.min) this.min = x
+    }
+};
+
+/**
+ * @return {void}
+ */
+MinStack.prototype.pop = function() {
+    // 当前值比最小值小，则需要
+    let val = this.stacks.pop()
+    if (val < 0) {
+        this.min -= val
+    }
+};
+
+/**
+ * @return {number}
+ */
+MinStack.prototype.top = function() {
+    if (this.stacks[this.stacks.length - 1] < 0) {
+        // 当前最小值就是推出项的值
+        return this.min
+    } else {
+        return this.stacks[this.stacks.length - 1] + this.min
+    }
+};
+
+/**
+ * @return {number}
+ */
+MinStack.prototype.getMin = function() {
+    return this.min
+};
+```
+
+结果：
+
+- 18/18 cases passed (124 ms)
+- Your runtime beats 71.47 % of javascript submissions
+- Your memory usage beats 16.67 % of javascript submissions (44.5 MB)
+- 时间复杂度： `O(1)`
+
+#### 查阅他人解法
+
+这里看到有用栈的，JS 里面我就不构建了。另外还看见一种把值和最小值混合存储的思路，挺有意思的。
+
+**Ⅰ.混合存储**
+
+代码：
+
+```javascript
+/**
+ * initialize your data structure here.
+ */
+var MinStack = function() {
+    // 栈内数据用数组存储
+    this.stacks = []
+    this.min = Infinity
+};
+
+/**
+ * @param {number} x
+ * @return {void}
+ */
+MinStack.prototype.push = function(x) {
+    // 先推上一步的最小值，再推原数据
+    if (x <= this.min) {
+        this.stacks.push(this.min)
+        this.min = x
+    }
+    this.stacks.push(x)
+};
+
+/**
+ * @return {void}
+ */
+MinStack.prototype.pop = function() {
+    // 如果推出值等于当前最小值，则将最小值更新为上一个最小值
+    if (this.stacks.pop() === this.min) {
+        this.min = this.stacks.pop()
+    }
+};
+
+/**
+ * @return {number}
+ */
+MinStack.prototype.top = function() {
+    return this.stacks[this.stacks.length - 1]
+};
+
+/**
+ * @return {number}
+ */
+MinStack.prototype.getMin = function() {
+    return this.min
+};
+```
+
+结果：
+
+- 18/18 cases passed (124 ms)
+- Your runtime beats 71.47 % of javascript submissions
+- Your memory usage beats 7.15 % of javascript submissions (45 MB)
+- 时间复杂度： `O(1)`
+
+#### 思考总结
+
+我个人是不推荐混合存储的，因为如果需要拓展查最大值，那整体逻辑实际上都需要调整。而前面两种方法，都只需要增加最大值数组或者最大值即可。
