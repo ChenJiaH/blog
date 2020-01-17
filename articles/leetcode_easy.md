@@ -45,6 +45,7 @@
 - [136.只出现一次的数字](#136只出现一次的数字)
 - [141.环形链表](#141环形链表)
 - [155.最小栈](#155最小栈)
+- [160.相交链表](#160相交链表)
 
 ## Easy
 
@@ -6417,3 +6418,172 @@ MinStack.prototype.getMin = function() {
 #### 思考总结
 
 我个人是不推荐混合存储的，因为如果需要拓展查最大值，那整体逻辑实际上都需要调整。而前面两种方法，都只需要增加最大值数组或者最大值即可。
+
+### 160.相交链表
+
+[题目地址](https://leetcode-cn.com/problems/intersection-of-two-linked-lists/)
+
+#### 题目描述
+
+编写一个程序，找到两个单链表相交的起始节点。
+
+如下面的两个链表：
+
+![相交链表](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/14/160_statement.png)
+
+在节点 c1 开始相交。
+
+注意：
+
+* 如果两个链表没有交点，返回 `null`.
+* 在返回结果后，两个链表仍须保持原有的结构。
+* 可假定整个链表结构中没有循环。
+* 程序尽量满足 `O(n)` 时间复杂度，且仅用 `O(1)` 内存。
+
+#### 题目分析设想
+
+这道题如果不加限制的话，方法还是很多的，比如说打标识，或者哈表表都可以解决问题。如果要满足内存要求的话，必然就不能使用哈希表。要满足保持原有结构，那就不能用打标识的方法了。这里有个取巧的方案，因为不存在循环，两者相加的总长度相等，所以如果存在交点，那结尾必然相等。
+
+#### 编写代码验证
+
+**Ⅰ.打标识**
+
+代码：
+
+```javascript
+/**
+ * @param {ListNode} headA
+ * @param {ListNode} headB
+ * @return {ListNode}
+ */
+var getIntersectionNode = function(headA, headB) {
+    // 因为是内存引用指向，取巧了
+    while(headA) {
+        headA.FLAG = true
+        headA = headA.next
+    }
+    while(headB) {
+        if (headB.FLAG) return headB
+        headB = headB.next
+    }
+    return null
+};
+```
+
+结果：
+
+- 45/45 cases passed (104 ms)
+- Your runtime beats 50.31 % of javascript submissions
+- Your memory usage beats 5.01 % of javascript submissions (45.3 MB)
+- 时间复杂度： `O(m + n)`
+
+**Ⅱ.哈希表法**
+
+代码：
+
+```javascript
+/**
+ * @param {ListNode} headA
+ * @param {ListNode} headB
+ * @return {ListNode}
+ */
+var getIntersectionNode = function(headA, headB) {
+    let hash = new Set()
+    while(headA) {
+        hash.add(headA)
+        headA = headA.next
+    }
+    while(headB) {
+        if (hash.has(headB)) return headB
+        headB = headB.next
+    }
+    return null
+};
+```
+
+结果：
+
+- 45/45 cases passed (100 ms)
+- Your runtime beats 67.12 % of javascript submissions
+- Your memory usage beats 68.1 % of javascript submissions (43.8 MB)
+- 时间复杂度： `O(m + n)`
+
+**Ⅲ.双指针法**
+
+代码：
+
+```javascript
+/**
+ * @param {ListNode} headA
+ * @param {ListNode} headB
+ * @return {ListNode}
+ */
+var getIntersectionNode = function(headA, headB) {
+    // 用两个指针同时右移，A完了之后指向B继续右移
+    let pA = headA
+    let pB = headB
+    while(pA !== pB) {
+        pA = pA ? pA.next : headB
+        pB = pB ? pB.next : headA
+    }
+    return pA
+};
+```
+
+结果：
+
+- 45/45 cases passed (100 ms)
+- Your runtime beats 67.12 % of javascript submissions
+- Your memory usage beats 72.7 % of javascript submissions (43.3 MB)
+- 时间复杂度： `O(m + n)`
+
+#### 查阅他人解法
+
+这里一般的二重循环就不说了，跟两个数组中找同样的数一样，没有什么区别，效率也比较底下。另外看见一个有意思的思路是，把两个链表拼成环，转化成找环节点的问题。
+
+**Ⅰ.转换环**
+
+代码：
+
+```javascript
+/**
+ * @param {ListNode} headA
+ * @param {ListNode} headB
+ * @return {ListNode}
+ */
+var getIntersectionNode = function(headA, headB) {
+    if (headA == null || headB == null)  return null;
+    let curA = headA,curB = headB;
+    while(curA.next != null){
+        curA = curA.next;
+    }
+    curA.next = headA;
+    let fast = headB,slow = headB;
+    while(fast != null&&fast.next != null){
+          slow = slow.next;
+          fast = fast.next.next;
+          if(slow == fast){
+             slow = headB;
+             while(slow != fast){
+                 slow = slow.next;
+                 fast = fast.next;
+            }
+            curA.next = null;
+            return fast;
+          }
+    }
+    curA.next = null;
+    return null;
+};
+```
+
+结果：
+
+- 45/45 cases passed (104 ms)
+- Your runtime beats 50.31 % of javascript submissions
+- Your memory usage beats 12.39 % of javascript submissions (44.6 MB)
+- 时间复杂度： `O(m + n)`
+
+#### 思考总结
+
+这里要满足空间复杂度要求，那就不能用哈希表法；要满足不改变原始数据结构，那就不能用标识法。所以这种情况下我更建议使用双指针法来直接作答，而转换为环虽然是一个思路，但是其实由一个问题转换为另一个问题，心智负担没有降低。
