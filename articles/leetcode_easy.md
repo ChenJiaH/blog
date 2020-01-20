@@ -46,6 +46,7 @@
 - [141.环形链表](#141环形链表)
 - [155.最小栈](#155最小栈)
 - [160.相交链表](#160相交链表)
+- [160.两数之和II输入有序数组](#160两数之和II输入有序数组)
 
 ## Easy
 
@@ -6587,3 +6588,76 @@ var getIntersectionNode = function(headA, headB) {
 #### 思考总结
 
 这里要满足空间复杂度要求，那就不能用哈希表法；要满足不改变原始数据结构，那就不能用标识法。所以这种情况下我更建议使用双指针法来直接作答，而转换为环虽然是一个思路，但是其实由一个问题转换为另一个问题，心智负担没有降低。
+
+### 167.两数之和II输入有序数组
+
+[题目地址](https://leetcode-cn.com/problems/two-sum-ii-input-array-is-sorted/)
+
+#### 题目描述
+
+给定一个已按照 **升序排列** 的有序数组，找到两个数使得它们相加之和等于目标数。
+
+函数应该返回这两个下标值 index1 和 index2，其中 index1 必须小于 index2。
+
+说明:
+
+- 返回的下标值（index1 和 index2）不是从零开始的。
+- 你可以假设每个输入只对应唯一的答案，而且你不可以重复使用相同的元素。
+
+示例:
+
+```javascript
+输入: numbers = [2, 7, 11, 15], target = 9
+输出: [1,2]
+解释: 2 与 7 之和等于目标数 9 。因此 index1 = 1, index2 = 2 。
+```
+
+#### 题目分析设想
+
+这道题有几个地方做了说明了，需要注意一下：有序的升序数组、下标不从零开始、不能重复使用相同元素。之前第一期的两数之和的方法就不做分析了（两次遍历和哈希表），这里可以利用有序数组来提高效率，利用首尾指针，来做判断，可以理解为夹逼原则。
+
+#### 编写代码验证
+
+**Ⅰ.双指针夹逼**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} numbers
+ * @param {number} target
+ * @return {number[]}
+ */
+var twoSum = function(numbers, target) {
+    let start = 0
+    let end = numbers.length - 1
+    while(start < end) {
+        const sum = numbers[start] + numbers[end]
+        if (sum === target) {
+            // 不从零开始，所以需要加一
+            return [start + 1, end + 1]
+        } else if (sum > target) {
+            end--
+        } else {
+            start++
+        }
+    }
+    // 由于有唯一输出，所以必然有结果，也不需要做特殊处理
+    return [-1, -1]
+};
+```
+
+结果：
+
+- 17/17 cases passed (64 ms)
+- Your runtime beats 87.01 % of javascript submissions
+- Your memory usage beats 40.91 % of javascript submissions (35.2 MB)
+- 时间复杂度： `O(n)`
+
+#### 查阅他人解法
+
+看了一下解法，没有效率更高的方式了。一些基本的解法在第一期的第一题可以查阅。另外有一个是以一个数为基准，二分查找，但是这样的话其实只是在两次循环基础上做了优化，甚至还不如哈希表效率高。所以，这里就没有看见其他有不同思路的解法了。
+
+#### 思考总结
+
+既然数组有序，我们就可以用夹逼原则来求解，在这道题我觉得是最合适，也是最高效的解法了。
