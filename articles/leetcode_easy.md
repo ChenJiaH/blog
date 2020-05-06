@@ -6661,3 +6661,100 @@ var twoSum = function(numbers, target) {
 #### 思考总结
 
 既然数组有序，我们就可以用夹逼原则来求解，在这道题我觉得是最合适，也是最高效的解法了。
+
+### 168.Excel表列名称
+
+[题目地址](https://leetcode-cn.com/problems/excel-sheet-column-title/)
+
+#### 题目描述
+
+给定一个正整数，返回它在 Excel 表中相对应的列名称。
+
+例如，
+
+```javascript
+    1 -> A
+    2 -> B
+    3 -> C
+    ...
+    26 -> Z
+    27 -> AA
+    28 -> AB
+    ...
+```
+
+示例:
+
+```javascript
+输入: 1
+输出: "A"
+
+输入: 28
+输出: "AB"
+
+输入: 701
+输出: "ZY"
+```
+
+#### 题目分析设想
+
+这道题其实很清晰，就是将10进制转成26进制的问题。直接用取余运算就行，唯一的难点在于如何转成26进制。
+
+#### 编写代码验证
+
+**Ⅰ.取余**
+
+代码：
+
+```javascript
+/**
+ * @param {number} n
+ * @return {string}
+ */
+var convertToTitle = function(n) {
+    let str = ''
+    while( n > 0) {
+        // 因为A代表1，减一就能从0开始匹配进制转换
+        n--
+        str += String.fromCharCode(n % 26 + 'A'.charCodeAt())
+        n = Math.floor(n / 26)
+    }
+    return str.split('').reverse().join('')
+};
+```
+
+结果：
+
+- 18/18 cases passed (64 ms)
+- Your runtime beats 57.06 % of javascript submissions
+- Your memory usage beats 100 % of javascript submissions (33.7 MB)
+- 时间复杂度： `O(n)`
+
+#### 查阅他人解法
+
+看了一下解法，思路没有什么区别，有一个有意思的就是强行转换成一行，这里也列一下。
+
+**Ⅰ.单行代码**
+
+代码：
+
+```javascript
+/**
+ * @param {number} n
+ * @return {string}
+ */
+var convertToTitle = function(n, s = '') {
+    return !n-- ? s : convertToTitle(~~(n / 26), String.fromCharCode('A'.charCodeAt() + n % 26) + s);
+};
+```
+
+结果：
+
+- 18/18 cases passed (60 ms)
+- Your runtime beats 76.47 % of javascript submissions
+- Your memory usage beats 100 % of javascript submissions (33.7 MB)
+- 时间复杂度： `O(n)`
+
+#### 思考总结
+
+这道题本质上就是一道进制转换的题目，没有什么太大的难度。
