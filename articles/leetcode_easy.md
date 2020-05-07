@@ -46,7 +46,9 @@
 - [141.环形链表](#141环形链表)
 - [155.最小栈](#155最小栈)
 - [160.相交链表](#160相交链表)
-- [160.两数之和II输入有序数组](#160两数之和II输入有序数组)
+- [167.两数之和II输入有序数组](#167两数之和II输入有序数组)
+- [168.Excel表列名称](#168Excel表列名称)
+- [169.求众数](#169求众数)
 
 ## Easy
 
@@ -6758,3 +6760,189 @@ var convertToTitle = function(n, s = '') {
 #### 思考总结
 
 这道题本质上就是一道进制转换的题目，没有什么太大的难度。
+
+### 169.求众数
+
+[题目地址](https://leetcode-cn.com/problems/majority-element/)
+
+#### 题目描述
+
+给定一个大小为 n 的数组，找到其中的多数元素。多数元素是指在数组中出现次数大于 `⌊ n/2 ⌋` 的元素。
+
+你可以假设数组是非空的，并且给定的数组总是存在多数元素。
+
+示例:
+
+```javascript
+输入: [3,2,3]
+输出: 3
+
+输入: [2,2,1,1,1,2,2]
+输出: 2
+```
+
+#### 题目分析设想
+
+这道题就是找出出现次数最多的元素，按照常规的思路的话有这么两种方式。
+
+- 哈希法，通过哈希表记录每个数出现的次数，找到出现次数最多的数
+- 分治法，将数组二分，分别求两边的多数元素，然后找出出现次数多的元素
+
+由于这里是找多数元素，有个前提是保证出现次数大于一半，这里也可以取巧，先排序，排序后中间那个数一定是多数元素。
+
+#### 编写代码验证
+
+**Ⅰ.哈希法**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var majorityElement = function(nums) {
+    let hash = {}
+    for(let i = 0; i < nums.length; i++) {
+        if (hash[nums[i]] === undefined) {
+            hash[nums[i]] = 1
+        } else {
+            hash[nums[i]] += 1
+            // 大于等于一半就可以直接认定为众数了
+            if (hash[nums[i]] >= nums.length / 2) {
+                return nums[i]
+            }
+        }
+    }
+    let count = 0
+    let val = null
+    for(let key in hash) {
+        if (hash[key] > count) {
+            count = hash[key]
+            val = key
+        }
+    }
+    return val
+};
+```
+
+结果：
+
+- 46/46 cases passed (88 ms)
+- Your runtime beats 41.1 % of javascript submissions
+- Your memory usage beats 92.86 % of javascript submissions (37.6 MB)
+- 时间复杂度： `O(n)`
+
+**Ⅱ.分治法**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var majorityElement = function(nums) {
+    function countEle(arr, num, l, h) {
+        let count = 0
+        for(let i = l; i <= h; i++) {
+            if (arr[i] === num) {
+                count += 1
+            }
+        }
+        return count
+    }
+    function getEle(arr, l, h) {
+        debugger
+        if (l === h) { // 就一个元素，直接返回
+            return arr[l]
+        }
+        // 取中位数，减法主要为了防止溢出
+        let mid = parseInt((h - l) / 2 + l)
+        // 左边的众数
+        let left = getEle(arr, l, mid)
+        // 右边的众数
+        let right = getEle(arr, mid + 1, h)
+        // 如果左右两边数组为同一个众数，则直接返回
+        if (left === right) {
+            return left
+        }
+        // 比较众数出现次数，注意：要用父数组取出现次数做比较
+        // 要不像这种将返回错误结果：[4,5,4,4,4,5]
+        let leftCount = countEle(arr, left, l, h)
+        let rightCount = countEle(arr, right, l, h)
+        return leftCount > rightCount ? left : right
+    }
+    return getEle(nums, 0, nums.length - 1)
+};
+```
+
+结果：
+
+- 46/46 cases passed (148 ms)
+- Your runtime beats 5.98 % of javascript submissions
+- Your memory usage beats 28.57 % of javascript submissions (38.2 MB)
+- 时间复杂度： `O(nlog(n))`
+
+**Ⅲ.排序法**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var majorityElement = function(nums) {
+    return nums.sort()[nums.length >>> 1]
+};
+```
+
+结果：
+
+- 46/46 cases passed (100 ms)
+- Your runtime beats 24.58 % of javascript submissions
+- Your memory usage beats 92.86 % of javascript submissions (37.3 MB)
+- 时间复杂度： `O(nlog(n))`，完全是数组排序的复杂度
+
+#### 查阅他人解法
+
+发现了一种叫做 Boyer Moore 投票算法。这个算法通俗点解释起来还是很容易理解的，其实可以理解为互相抵消。每一个众数和一个其他数抵消，剩下的必然就是众数了。
+
+**Ⅰ.投票算法**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var majorityElement = function(nums) {
+    let count = 0
+    let candidate = null
+    for(let i = 0; i < nums.length; i++) {
+        if (count === 0) {
+            candidate = nums[i]
+        }
+        // 同样的数累加，不同的数相减，可以理解为同数量抵消，抵消完产生新的备选数
+        count += (nums[i] === candidate) ? 1 : -1
+    }
+    return candidate
+};
+```
+
+结果：
+
+- 46/46 cases passed (80 ms)
+- Your runtime beats 56.39 % of javascript submissions
+- Your memory usage beats 92.86 % of javascript submissions (37.3 MB)
+- 时间复杂度： `O(n)`
+
+#### 思考总结
+
+比较显而易见的是，这道题使用投票算法只需遍历一次，也不需要额外的空间，为最优解。
