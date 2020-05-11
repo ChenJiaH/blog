@@ -49,6 +49,7 @@
 - [167.两数之和II输入有序数组](#167两数之和II输入有序数组)
 - [168.Excel表列名称](#168Excel表列名称)
 - [169.求众数](#169求众数)
+- [171.Excel表列序号](#171Excel表列序号)
 
 ## Easy
 
@@ -6946,3 +6947,103 @@ var majorityElement = function(nums) {
 #### 思考总结
 
 比较显而易见的是，这道题使用投票算法只需遍历一次，也不需要额外的空间，为最优解。
+
+### 171.Excel表列序号
+
+[题目地址](https://leetcode-cn.com/problems/excel-sheet-column-number/)
+
+#### 题目描述
+
+给定一个Excel表格中的列名称，返回其相应的列序号。
+
+例如，
+
+```javascript
+    A -> 1
+    B -> 2
+    C -> 3
+    ...
+    Z -> 26
+    AA -> 27
+    AB -> 28
+    ...
+```
+
+示例:
+
+```javascript
+输入: "A"
+输出: 1
+
+输入: "AB"
+输出: 28
+
+输入: "ZY"
+输出: 701
+```
+
+#### 题目分析设想
+
+这道题其实就是上面168题的逆推导，也是就26进制转10进制。所以解法也很直接，做转换即可。无非区别在于正序和倒序处理罢了。
+
+#### 编写代码验证
+
+**Ⅰ.正序转换**
+
+代码：
+
+```javascript
+/**
+ * @param {string} s
+ * @return {number}
+ */
+var titleToNumber = function(s) {
+    let res = 0
+    for(let i = 0; i < s.length; i++) {
+        res = res * 26 + (s.charCodeAt(i) - 'A'.charCodeAt() + 1)
+    }
+    return res
+};
+```
+
+结果：
+
+- 1000/1000 cases passed (84 ms)
+- Your runtime beats 69.77 % of javascript submissions
+- Your memory usage beats 33.33 % of javascript submissions (36.1 MB)
+- 时间复杂度： `O(n)`
+
+**Ⅱ.倒序转换**
+
+代码：
+
+```javascript
+/**
+ * @param {string} s
+ * @return {number}
+ */
+var titleToNumber = function(s) {
+    let res = 0
+    let mul = 1
+    for(let i = s.length - 1; i >= 0; i--) {
+        res += (s.charCodeAt(i) - 'A'.charCodeAt() + 1) * mul
+        mul *= 26
+    }
+    return res
+};
+```
+
+结果：
+
+- 1000/1000 cases passed (100 ms)
+- Your runtime beats 20.5 % of javascript submissions
+- Your memory usage beats 100 % of javascript submissions (34.7 MB)
+- 时间复杂度： `O(n)`
+
+#### 查阅他人解法
+
+看了一下解法，大部分都是常规的倒序解法。正序的话其实就是秦九韶算法。
+
+#### 思考总结
+
+这道题没有什么难度，就是一个进制转换的过程，比较容易想到的也就是倒序遍历，转换求解。
