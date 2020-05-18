@@ -50,6 +50,7 @@
 - [168.Excel表列名称](#168Excel表列名称)
 - [169.求众数](#169求众数)
 - [171.Excel表列序号](#171Excel表列序号)
+- [172.阶乘后的零](#172阶乘后的零)
 
 ## Easy
 
@@ -7047,3 +7048,114 @@ var titleToNumber = function(s) {
 #### 思考总结
 
 这道题没有什么难度，就是一个进制转换的过程，比较容易想到的也就是倒序遍历，转换求解。
+
+### 172.阶乘后的零
+
+[题目地址](https://leetcode-cn.com/problems/factorial-trailing-zeroes/)
+
+#### 题目描述
+
+给定一个整数 `n`，返回 `n!` 结果尾数中零的数量。
+
+示例:
+
+```javascript
+输入: 3
+输出: 0
+解释: 3! = 6, 尾数中没有零。
+
+输入: 5
+输出: 1
+解释: 5! = 120, 尾数中有 1 个零.
+```
+
+说明: 你算法的时间复杂度应为 O(log n) 。
+
+#### 题目分析设想
+
+这道题明显不适合算出来阶乘的值再来算有多少个零，因为很容易溢出，且复杂度高。所以这里需要找到规律，这里规律还很明显，零的产生一定是由 `2x5(4看作2x2)`，所以本质上还是看 `5` 的数量，当然 `5^n` 还需要再累加。
+
+#### 编写代码验证
+
+**Ⅰ.累加5的每个幂的个数**
+
+代码：
+
+```javascript
+/**
+ * @param {number} n
+ * @return {number}
+ */
+var trailingZeroes = function(n) {
+    let res = 0
+    while (n) {
+        n = n / 5 | 0
+        res += n
+    }
+    return res
+};
+```
+
+结果：
+
+- 502/502 cases passed (76 ms)
+- Your runtime beats 55.62 % of javascript submissions
+- Your memory usage beats 100 % of javascript submissions (34.5 MB)
+- 时间复杂度： `O(log(n))`
+
+其实除5也可以等同于 `xxx/5 + xxx/25 + xxx/125 + xxx/5^n`，当5^n超过阶乘数的时候，必然取0。
+
+代码：
+
+```javascript
+/**
+ * @param {number} n
+ * @return {number}
+ */
+var trailingZeroes = function(n) {
+    let res = 0
+    let num = 5
+    while (n >= num) {
+        res += n / num | 0
+        num *= 5
+    }
+    return res
+};
+```
+
+结果：
+
+- 502/502 cases passed (76 ms)
+- Your runtime beats 55.62 % of javascript submissions
+- Your memory usage beats 100 % of javascript submissions (34.3 MB)
+- 时间复杂度： `O(log(n))`
+
+#### 查阅他人解法
+
+没有看见更优的算法，但是看到一个偏硬核的，其实也就是上面的解法的提前枚举。因为我们之前数值运算有MAX边界，所以5^n是可枚举。
+
+****Ⅰ.枚举****
+
+代码：
+
+```javascript
+/**
+ * @param {number} n
+ * @return {number}
+ */
+var trailingZeroes = function(n) {
+    return (n/5 | 0)+(n/25 | 0)+(n/125 | 0)+(n/625 | 0)+(n/3125 | 0)+(n/15625 | 0)+(n/78125 | 0)+(n/390625 | 0)
+    +(n/1953125 | 0)+(n/9765625 | 0)+(n/48828125 | 0)+(n/244140625 | 0)+(n/1220703125 | 0);
+};
+```
+
+结果：
+
+- 502/502 cases passed (80 ms)
+- Your runtime beats 37.95 % of javascript submissions
+- Your memory usage beats 100 % of javascript submissions (34.4 MB)
+- 时间复杂度： `O(log(n))`
+
+#### 思考总结
+
+枚举的方式纯属一乐，这道题的本质还是找到5的关键点，将问题进行转换求解即可。
