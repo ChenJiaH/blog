@@ -30,6 +30,11 @@ export default {
         bio: 'Find the bug of the world',
         name: 'Forsigner',
         url: 'http://forsigner.com',
+      }, {
+        avatar: 'https://kalasearch.cn/favicon-32x32.png',
+        bio: '让每次搜索成为享受',
+        name: '卡拉搜索',
+        url: 'https://kalasearch.cn',
       }],
     };
   },
