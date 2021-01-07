@@ -52,6 +52,7 @@
 - [171.Excel表列序号](#171Excel表列序号)
 - [172.阶乘后的零](#172阶乘后的零)
 - [190.颠倒二进制位](#190颠倒二进制位)
+- [191.位1的个数](#191位1的个数)
 
 ## Easy
 
@@ -7281,3 +7282,124 @@ var reverseBits = function(n) {
 #### 思考总结
 
 这题的考点也就在位运算了，熟悉熟悉很容易就能处理。不过熟悉位运算符对于一些运算来讲还是非常有意义的。
+
+### 191.位1的个数
+
+[题目地址](https://leetcode-cn.com/problems/number-of-1-bits/)
+
+#### 题目描述
+
+编写一个函数，输入是一个无符号整数（以二进制串的形式），返回其二进制表达式中数字位数为 `1` 的个数（也被称为汉明重量）。
+
+示例:
+
+```javascript
+输入：00000000000000000000000000001011
+输出：3
+解释：输入的二进制串 00000000000000000000000000001011 中，共有三位为 '1'。
+
+输入：00000000000000000000000010000000
+输出：1
+解释：输入的二进制串 00000000000000000000000010000000 中，共有一位为 '1'。
+
+输入：11111111111111111111111111111101
+输出：31
+解释：输入的二进制串 11111111111111111111111111111101 中，共有 31 位为 '1'。
+```
+
+提示：
+
+- 请注意，在某些语言（如 Java）中，没有无符号整数类型。在这种情况下，输入和输出都将被指定为有符号整数类型，并且不应影响您的实现，因为无论整数是有符号的还是无符号的，其内部的二进制表示形式都是相同的。
+- 在 Java 中，编译器使用二进制补码记法来表示有符号整数。因此，在上面的 示例 2 中，输入表示有符号整数 -3，输出表示有符号整数 -1073741825。
+
+
+进阶:
+如果多次调用这个函数，你将如何优化你的算法？
+
+#### 题目分析设想
+
+做了上道题之后，这道题，还可以使用位运算符来处理。同样，通过字符串获取也可以实现，但这显然不是这题的考点。
+
+#### 编写代码验证
+
+**Ⅰ.位运算**
+
+代码：
+
+```javascript
+/**
+ * @param {number} n - a positive integer
+ * @return {number}
+ */
+var hammingWeight = function(n) {
+    let t = 32, r = 0;
+    while(t--) {
+        if (n & 1 === 1) r++; // 判断最后一位
+        n >>= 1 // 待处理数字右移
+    }
+    return r;
+};
+```
+
+结果：
+
+- 601/601 cases passed (88 ms)
+- Your runtime beats 84.03 % of javascript submissions
+- Your memory usage beats 91.49 % of javascript submissions (38.8 MB)
+- 时间复杂度： `O(1)`
+
+**Ⅱ.字符串处理**
+
+代码：
+
+```javascript
+/**
+ * @param {number} n - a positive integer
+ * @return {number}
+ */
+var hammingWeight = function(n) {
+    return n.toString(2).replaceAll('0', '').length
+};
+```
+
+结果：
+
+- 601/601 cases passed (92 ms)
+- Your runtime beats 68.73 % of javascript submissions
+- Your memory usage beats 88.54 % of javascript submissions (38.9 MB)
+- 时间复杂度： `O(1)`
+
+#### 查阅他人解法
+
+实现方法就太多了，大同小异，既然考位运算，那就再换成左移作答吧。其他的思路也都大同小异，无非就是加减、几位运算的区别。
+
+****Ⅰ.位运算-1左移****
+
+代码：
+
+```javascript
+/**
+ * @param {number} n - a positive integer
+ * @return {number} - a positive integer
+ */
+var reverseBits = function(n) {
+    let t = 32, r = 0;
+    while(t--) {
+        if ((n & (1 << (32 - t))) != 0) {
+            r++;
+        }
+    }
+    return r;
+};
+```
+
+结果：
+
+- 601/601 cases passed (104 ms)
+- Your runtime beats 21.48 % of javascript submissions
+- Your memory usage beats 82.75 % of javascript submissions (39 MB)
+- 时间复杂度： `O(1)`
+
+#### 思考总结
+
+说白了如果做了上道题之后，这题就没有什么价值了，只是写法问题，解法可太多了。
