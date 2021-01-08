@@ -53,6 +53,7 @@
 - [172.阶乘后的零](#172阶乘后的零)
 - [190.颠倒二进制位](#190颠倒二进制位)
 - [191.位1的个数](#191位1的个数)
+- [198.打家劫舍](#198打家劫舍)
 
 ## Easy
 
@@ -7403,3 +7404,107 @@ var reverseBits = function(n) {
 #### 思考总结
 
 说白了如果做了上道题之后，这题就没有什么价值了，只是写法问题，解法可太多了。
+
+### 198.打家劫舍
+
+[题目地址](https://leetcode-cn.com/problems/house-robber/)
+
+#### 题目描述
+
+你是一个专业的小偷，计划偷窃沿街的房屋。每间房内都藏有一定的现金，影响你偷窃的唯一制约因素就是相邻的房屋装有相互连通的防盗系统，如果两间相邻的房屋在同一晚上被小偷闯入，系统会自动报警。
+
+给定一个代表每个房屋存放金额的非负整数数组，计算你 不触动警报装置的情况下 ，一夜之内能够偷窃到的最高金额。
+
+示例:
+
+```javascript
+输入：[1,2,3,1]
+输出：4
+解释：偷窃 1 号房屋 (金额 = 1) ，然后偷窃 3 号房屋 (金额 = 3)。
+     偷窃到的最高金额 = 1 + 3 = 4 。
+
+输入：[2,7,9,3,1]
+输出：12
+解释：偷窃 1 号房屋 (金额 = 2), 偷窃 3 号房屋 (金额 = 9)，接着偷窃 5 号房屋 (金额 = 1)。
+     偷窃到的最高金额 = 2 + 9 + 1 = 12 。
+```
+
+提示：
+
+- 0 <= nums.length <= 100
+- 0 <= nums[i] <= 400
+
+#### 题目分析设想
+
+这道题可以转化一下，简化之后其实就是奇数项和偶数项的和的比较。最基础的思路就是分别求和，然后记录当前比较结果后再继续分别求和。如果每次利用上每次的结果的话，那就变成了一个动态规划求解的问题了，所以这道题我们循序渐进来作答。
+
+#### 编写代码验证
+
+**Ⅰ.分别求和**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var rob = function(nums) {
+    let evenTotal = 0, oddTotal = 0;
+    for(let i = 0; i < nums.length; i++) {
+        if (i & 1) {
+            evenTotal += nums[i]
+            evenTotal = Math.max(evenTotal, oddTotal) // 取两种方式的更大值
+        } else {
+            oddTotal += nums[i]
+            oddTotal = Math.max(evenTotal, oddTotal) // 取两种方式的更大值
+        }
+    }
+    return Math.max(evenTotal, oddTotal)
+};
+```
+
+结果：
+
+- 69/69 cases passed (84 ms)
+- Your runtime beats 53.82 % of javascript submissions
+- Your memory usage beats 61.74 % of javascript submissions (37.6 MB)
+- 时间复杂度： `O(n)`
+
+**Ⅱ.动态规划**
+
+代码：
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var rob = function(nums) {
+    const len = nums.length;
+    if (len === 0) return 0
+    if (len === 1) return nums[0]
+    if (len === 2) return Math.max(nums[0], nums[1])
+    // dp[i] 表示偷i+1间的最大收益
+    let dp = [nums[0], Math.max(nums[0], nums[1])]
+    for(let i = 2; i < len; i++) {
+        dp[i] = Math.max(dp[i-1], dp[i-2] + nums[i])
+    }
+    return dp[nums.length - 1]
+};
+```
+
+结果：
+
+- 69/69 cases passed (72 ms)
+- Your runtime beats 95.68 % of javascript submissions
+- Your memory usage beats 26.94 % of javascript submissions (37.9 MB)
+- 时间复杂度： `O(n)`
+
+#### 查阅他人解法
+
+看了一下解法，基本都是动态规划求解。
+
+#### 思考总结
+
+这道题如果看多了，基本能直接转化成一个动态规划的问题，有点类似于买卖股票。但是这题我更建议分别求和每次做比较的方式，这样的话其实空间复杂度是明显更低的。
