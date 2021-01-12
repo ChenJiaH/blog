@@ -54,6 +54,7 @@
 - [190.颠倒二进制位](#190颠倒二进制位)
 - [191.位1的个数](#191位1的个数)
 - [198.打家劫舍](#198打家劫舍)
+- [202.快乐数](#202快乐数)
 
 ## Easy
 
@@ -7508,3 +7509,137 @@ var rob = function(nums) {
 #### 思考总结
 
 这道题如果看多了，基本能直接转化成一个动态规划的问题，有点类似于买卖股票。但是这题我更建议分别求和每次做比较的方式，这样的话其实空间复杂度是明显更低的。
+
+### 202.快乐数
+
+[题目地址](https://leetcode-cn.com/problems/happy-number/)
+
+#### 题目描述
+
+编写一个算法来判断一个数 `n` 是不是快乐数。
+
+「快乐数」定义为：对于一个正整数，每一次将该数替换为它每个位置上的数字的平方和，然后重复这个过程直到这个数变为 1，也可能是 无限循环 但始终变不到 1。如果 可以变为  1，那么这个数就是快乐数。
+
+如果 `n` 是快乐数就返回 `True` ；不是，则返回 `False` 。
+
+示例:
+
+```javascript
+输入：19
+输出：true
+解释：
+1^2 + 9^2 = 82
+8^2 + 2^2 = 68
+6^2 + 8^2 = 100
+1^2 + 0^2 + 0^2 = 1
+```
+
+#### 题目分析设想
+
+这道题题目说的还挺清楚，要么是无限循环，要么是1，所以我们只需要判断这两个条件。而无限循环，我们又想到了之前做的题目[无限链表](https://github.com/ChenJiaH/blog/issues/50)，可以使用哈希表或者快慢指针的方法判定循环。
+
+#### 编写代码验证
+
+**Ⅰ.哈希表**
+
+代码：
+
+```javascript
+/**
+ * @param {number} n
+ * @return {boolean}
+ */
+var isHappy = function(n) {
+    const hash = {}
+    function calc (n) {
+        return String(n)
+        .split('')
+        .reduce((total, cur) => total + cur * cur, 0)
+    }
+    let res = calc(n);
+    while (res !== 1) {
+        if (hash[res]) return false
+        hash[res] = true;
+        res = calc(res)
+    }
+    return true
+};
+```
+
+结果：
+
+- 402/402 cases passed (76 ms)
+- Your runtime beats 98.94 % of javascript submissions
+- Your memory usage beats 97.11 % of javascript submissions (38.9 MB)
+- 时间复杂度： `O(log(n))`
+
+**Ⅱ.快慢指针**
+
+代码：
+
+```javascript
+/**
+ * @param {number} n
+ * @return {boolean}
+ */
+var isHappy = function(n) {
+    function calc (n) {
+        return String(n)
+        .split('')
+        .reduce((total, cur) => total + cur * cur, 0)
+    }
+    let slow = calc(n);
+    let fast = calc(slow);
+    while (slow !== fast) {
+        slow = calc(slow);
+        fast = calc(calc(fast));
+    }
+    return slow === 1
+};
+```
+
+结果：
+
+- 402/402 cases passed (88 ms)
+- Your runtime beats 81.14 % of javascript submissions
+- Your memory usage beats 78.71 % of javascript submissions (39.3 MB)
+- 时间复杂度： `O(log(n))`
+
+#### 查阅他人解法
+
+这里看到一个非常有意思的数学证明[快乐数](https://bk.tw.lvfukeji.com/wiki/%E5%BF%AB%E6%A8%82%E6%95%B8)，其实是有一个最大上限243。
+
+****Ⅰ.数学证明****
+
+代码：
+
+```javascript
+/**
+ * @param {number} n
+ * @return {boolean}
+ */
+var isHappy = function(n) {
+    // 循环数
+    const cycles = [4,16,37,58,89,145,42,20]
+    function calc (n) {
+        return String(n)
+        .split('')
+        .reduce((total, cur) => total + cur * cur, 0)
+    }
+    while(n !== 1 && !cycles.includes(n)) {
+        n = calc(n)
+    }
+    return n === 1
+};
+```
+
+结果：
+
+- 402/402 cases passed (84 ms)
+- Your runtime beats 91.42 % of javascript submissions
+- Your memory usage beats 74.54 % of javascript submissions (39.3 MB)
+- 时间复杂度： `O(log(n))`
+
+#### 思考总结
+
+只要是判断循环的，优先考虑快慢指针方式来作答就可以了。当然这里感兴趣也可以去看看数学推导证明，还挺有意思的。
