@@ -55,6 +55,7 @@
 - [191.位1的个数](#191位1的个数)
 - [198.打家劫舍](#198打家劫舍)
 - [202.快乐数](#202快乐数)
+- [203.移除链表元素](#203移除链表元素)
 
 ## Easy
 
@@ -3607,7 +3608,6 @@ var deleteDuplicates = function(head) {
     let pre = head
     let cur = head
     while(cur !== null) {
-        debugger
         if (cur.val === pre.val) {
             // 当前指针移动
             cur = cur.next
@@ -7643,3 +7643,129 @@ var isHappy = function(n) {
 #### 思考总结
 
 只要是判断循环的，优先考虑快慢指针方式来作答就可以了。当然这里感兴趣也可以去看看数学推导证明，还挺有意思的。
+
+### 203.移除链表元素
+
+[题目地址](https://leetcode-cn.com/problems/remove-linked-list-elements/)
+
+#### 题目描述
+
+删除链表中等于给定值 `val` 的所有节点。
+
+示例:
+
+```javascript
+输入: 1->2->6->3->4->5->6, val = 6
+输出: 1->2->3->4->5
+```
+
+#### 题目分析设想
+
+又是一道链表相关的题，直接循环处理即可，考虑一下头节点和尾节点即可。当然比较常见方法的就是用哨兵节点处理。
+
+#### 编写代码验证
+
+**Ⅰ.直接处理**
+
+代码：
+
+```javascript
+/**
+ * @param {ListNode} head
+ * @param {number} val
+ * @return {ListNode}
+ */
+var removeElements = function(head, val) {
+    // 删除头部相等的节点
+    while(head && head.val === val) {
+        head = head.next
+    }
+    if (head === null) return null;
+    // 引用赋值，新的头节点
+    let prev = head;
+    while(prev.next) {
+        if (prev.next.val === val) {
+            prev.next = prev.next.next
+        } else {
+            prev = prev.next
+        }
+    }
+    return head;
+};
+```
+
+结果：
+
+- 65/65 cases passed (108 ms)
+- Your runtime beats 47.55 % of javascript submissions
+- Your memory usage beats 57.74 % of javascript submissions (42.4 MB)
+- 时间复杂度： `O(n)`
+
+**Ⅱ.哨兵节点**
+
+代码：
+
+```javascript
+/**
+ * @param {ListNode} head
+ * @param {number} val
+ * @return {ListNode}
+ */
+var removeElements = function(head, val) {
+    // 新建哨兵节点
+    let vNode = new ListNode(-1);
+    vNode.next = head;
+    let prev = vNode;
+    while(prev.next) {
+        if (prev.next.val === val) {
+            prev.next = prev.next.next
+        } else {
+            prev = prev.next
+        }
+    }
+    return vNode.next
+};
+```
+
+结果：
+
+- 65/65 cases passed (96 ms)
+- Your runtime beats 92.01 % of javascript submissions
+- Your memory usage beats 67.45 % of javascript submissions (42.4 MB)
+- 时间复杂度： `O(n)`
+
+#### 查阅他人解法
+
+都是做指针操作的解法，无非就是通过哨兵节点可以避免头节点特殊处理罢了。这里还有一个递归的解法，确实很赞。
+
+**Ⅰ.递归**
+
+代码：
+
+```javascript
+/**
+ * @param {ListNode} head
+ * @param {number} val
+ * @return {ListNode}
+ */
+var removeElements = function(head, val) {
+    if (head === null) return null;
+    head.next = removeElements(head.next, val);
+    if (head.val === val) {
+        return head.next;
+    } else {
+        return head
+    }
+};
+```
+
+结果：
+
+- 65/65 cases passed (108 ms)
+- Your runtime beats 47.55 % of javascript submissions
+- Your memory usage beats 15.63 % of javascript submissions (42.8 MB)
+- 时间复杂度： `O(n)`
+
+#### 思考总结
+
+常规的链表的解法都是围绕指针来处理的，所以常见的也就几种：双指针、哨兵节点等等。不得不说，这道题用递归还是很巧妙的。
