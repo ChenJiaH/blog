@@ -56,6 +56,7 @@
 - [198.打家劫舍](#198打家劫舍)
 - [202.快乐数](#202快乐数)
 - [203.移除链表元素](#203移除链表元素)
+- [204.计算质数](#204计算质数)
 
 ## Easy
 
@@ -7769,3 +7770,227 @@ var removeElements = function(head, val) {
 #### 思考总结
 
 常规的链表的解法都是围绕指针来处理的，所以常见的也就几种：双指针、哨兵节点等等。不得不说，这道题用递归还是很巧妙的。
+
+### 204.计算质数
+
+[题目地址](https://leetcode-cn.com/problems/count-primes/)
+
+#### 题目描述
+
+统计所有小于非负整数 `n` 的质数的数量。
+
+示例:
+
+```javascript
+输入：n = 10
+输出：4
+解释：小于 10 的质数一共有 4 个, 它们是 2, 3, 5, 7 。
+
+输入：n = 0
+输出：0
+
+输入：n = 1
+输出：0
+```
+
+提示：
+
+- 0 <= n <= 5 * 106
+
+#### 题目分析设想
+
+首先得明白质数有什么特性：只能被1和他本身整除。所以我们也是围绕这个规则来作答，然后再优化。
+
+#### 编写代码验证
+
+**Ⅰ.循环枚举计数**
+
+代码：
+
+```javascript
+/**
+ * @param {number} n
+ * @return {number}
+ */
+var countPrimes = function(n) {
+    let res = 0;
+    const isPrime = (n) => {
+        // 这里完全不需要到n，如果能整除，那最大也就 Math.sqrt(n)
+        for(let i = 2; i <= Math.sqrt(n); i++) {
+            if (n % i === 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+    for(let i = 2; i < n; i++) {
+        res += isPrime(i)
+    }
+    return res;
+};
+```
+
+结果：
+
+- 20/20 cases passed (920 ms)
+- Your runtime beats 23.66 % of javascript submissions
+- Your memory usage beats 70.15 % of javascript submissions (38 MB)
+- 时间复杂度： `O(Math.sqrt(n))`
+
+**Ⅱ.进一步优化**
+
+我们从 `i++` 这里入手，我们以最小的两个质数的最小公倍数 6 为基数来看，`6n+2/6n+3/6n+4` 一定不是质数，那么只需要判断 `6n+1/6n-1(6n+5)` 即可，这样我们可以大幅减少循环次数。
+
+代码：
+
+```javascript
+/**
+ * @param {number} n
+ * @return {number}
+ */
+var countPrimes = function(n) {
+    const isPrime = (n) => {
+        // 这里完全不需要到n，如果能整除，那最大也就 Math.sqrt(n)
+        for(let i = 2; i <= Math.sqrt(n); i++) {
+            if (n % i === 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+    if (n <= 2) return 0
+    if (n <= 3) return 1;
+    if (n <= 5) return 2;
+    let res = 3;
+    for(let i = 6; i < n; i+=6) {
+        if (i + 1 < n) {
+            res += isPrime(i+1);
+        }
+        if (i + 5 < n) {
+            res += isPrime(i+5);
+        }
+    }
+    return res;
+};
+```
+
+结果：
+
+- 20/20 cases passed (912 ms)
+- Your runtime beats 25.43 % of javascript submissions
+- Your memory usage beats 68.51 % of javascript submissions (38.1 MB)
+- 时间复杂度： `O(Math.sqrt(n))`
+
+#### 查阅他人解法
+
+发现很多种筛法，这题还挺多值得学的。
+
+**Ⅰ.埃拉托斯特尼筛法**
+
+这个算法的核心就是把质数的倍数都筛掉，剩下的就是质数了。
+
+代码：
+
+```javascript
+/**
+ * @param {number} n
+ * @return {number}
+ */
+var countPrimes = function(n) {
+    let res = 0;
+    let arr = new Array(n).fill(false);
+    for(let i = 2; i < n; i++) {
+        if(!arr[i-1]) {
+            res += 1
+            // 把质数的倍数都给筛掉
+            for(let j = i * i; j <= n; j += i) {
+                arr[j-1] = true;
+            }
+        }
+    }
+    return res;
+};
+```
+
+结果：
+
+- 20/20 cases passed (128 ms)
+- Your runtime beats 78.33 % of javascript submissions
+- Your memory usage beats 28.99 % of javascript submissions (50.5 MB)
+- 时间复杂度： `O(loglog(n))`
+
+**Ⅱ.线性筛**
+
+这个算法的核心用空间换时间，提供无重复标记的作答。每个合数一定可以以被写成唯一的质数乘积。
+
+代码：
+
+```javascript
+/**
+ * @param {number} n
+ * @return {number}
+ */
+var countPrimes = function(n) {
+    let primes = [];
+    let arr = new Array(n).fill(true)
+    for(let i = 2; i < n; i++) {
+        if (arr[i]) {
+            primes.push(i)
+        }
+        for(let j = 0, t; j < primes.length && (t = i * primes[j]) < n; j++) {
+            // 继续标记合数
+            arr[t] = false
+            // 如果能被质数整除，直接跳过该数
+            if (i % primes[j] === 0) break;
+        }
+    }
+    return primes.length;
+};
+```
+
+结果：
+
+- 20/20 cases passed (148 ms)
+- Your runtime beats 58.57 % of javascript submissions
+- Your memory usage beats 16.59 % of javascript submissions (63.5 MB)
+- 时间复杂度： `O(loglog(n))`
+
+**Ⅲ.奇数筛**
+
+偶数一定不是质数，所以只在奇数范围标记合数，未标记的是质数，而且只需要用奇数乘奇数即可，因为奇数乘偶数一定是偶数。
+
+代码：
+
+```javascript
+/**
+ * @param {number} n
+ * @return {number}
+ */
+var countPrimes = function(n) {
+    let arr = new Array(n).fill(false)
+    let res = n > 2 ? 1 : 0;
+    for(let i = 3; i < n; i += 2) {
+        if (!arr[i]) {
+            res += 1;
+            // 标识奇数乘积
+            if (i <= Math.sqrt(n)) {
+                for(let j = i, t; (t = i * j) < n; j+= 2) {
+                    arr[t] = true;
+                }
+            }
+        }
+    }
+    return res;
+};
+```
+
+结果：
+
+- 20/20 cases passed (108 ms)
+- Your runtime beats 88.29 % of javascript submissions
+- Your memory usage beats 27.75 % of javascript submissions (50.5 MB)
+- 时间复杂度： `O(loglog(n))`
+
+#### 思考总结
+
+这道题的解法还是挺多的，运用一些数学规则优化筛选效率来提升解法，值得反复品。
