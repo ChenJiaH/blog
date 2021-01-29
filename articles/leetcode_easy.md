@@ -57,6 +57,7 @@
 - [202.快乐数](#202快乐数)
 - [203.移除链表元素](#203移除链表元素)
 - [204.计算质数](#204计算质数)
+- [205.同构字符串](#205同构字符串)
 
 ## Easy
 
@@ -7994,3 +7995,175 @@ var countPrimes = function(n) {
 #### 思考总结
 
 这道题的解法还是挺多的，运用一些数学规则优化筛选效率来提升解法，值得反复品。
+
+### 205.同构字符串
+
+[题目地址](https://leetcode-cn.com/problems/isomorphic-strings/)
+
+#### 题目描述
+
+给定两个字符串 s 和 t，判断它们是否是同构的。
+
+如果 s 中的字符可以按某种映射关系替换得到 t ，那么这两个字符串是同构的。
+
+每个出现的字符都应当映射到另一个字符，同时不改变字符的顺序。不同字符不能映射到同一个字符上，相同字符只能映射到同一个字符上，字符可以映射到自己本身。
+
+示例:
+
+```javascript
+输入：s = "egg", t = "add"
+输出：true
+
+输入：s = "foo", t = "bar"
+输出：false
+
+输入：s = "paper", t = "title"
+输出：true
+```
+
+提示：
+
+- 可以假设 s 和 t 长度相同。
+
+#### 题目分析设想
+
+这道题有个假设，长度相同。所以我们比较的是同一字符出现的位置是否一致即可，这样一来解题方案就清晰了。
+
+#### 编写代码验证
+
+**Ⅰ.循环比较字符位置**
+
+当然用 `lastIndexOf` 也可以，没任何区别，如果形式一致，必然相等。
+
+代码：
+
+```javascript
+/**
+ * @param {string} s
+ * @param {string} t
+ * @return {boolean}
+ */
+var isIsomorphic = function(s, t) {
+    // 两者长度相等
+    if (s.length === 0) return true;
+    for(let i = 0; i < s.length; i++) {
+        if (s.indexOf(s.charAt(i)) !== t.indexOf(t.charAt(i))) {
+            return false
+        }
+    }
+    return true;
+};
+```
+
+结果：
+
+- 39/39 cases passed (76 ms)
+- Your runtime beats 99.24 % of javascript submissions
+- Your memory usage beats 54.5 % of javascript submissions (39.6 MB)
+- 时间复杂度： `O(n)`
+
+**Ⅱ.借助哈希表**
+
+通过哈希表，当然可以用索引来判断，也可以存对应的字符串来判断。
+
+代码：
+
+```javascript
+/**
+ * @param {string} s
+ * @param {string} t
+ * @return {boolean}
+ */
+var isIsomorphic = function(s, t) {
+    // 两者长度相等
+    if (s.length === 0) return true;
+    let hashS = {}, hashT = {};
+    for(let i = 0; i < s.length; i++) {
+        // 存索引比较
+        if (hashS[s.charAt(i)] !== hashT[t.charAt(i)]) {
+            return false
+        }
+        hashS[s.charAt(i)] = i;
+        hashT[t.charAt(i)] = i;
+    }
+    return true;
+};
+```
+
+结果：
+
+- 39/39 cases passed (100 ms)
+- Your runtime beats 49.48 % of javascript submissions
+- Your memory usage beats 71.99 % of javascript submissions (39.3 MB)
+- 时间复杂度： `O(n)`
+
+```javascript
+/**
+ * @param {string} s
+ * @param {string} t
+ * @return {boolean}
+ */
+var isIsomorphic = function(s, t) {
+    // 两者长度相等
+    if (s.length === 0) return true;
+    let hashS = {}, hashT = {};
+    for(let i = 0; i < s.length; i++) {
+        // 存字符比较
+        const charS = s.charAt(i);
+        const charT = t.charAt(i);
+        if (
+            (hashS[charS] && hashS[charS] !== charT) ||
+            (hashT[charT] && hashT[charT] !== charS)
+        ) {
+            return false
+        }
+        hashS[charS] = charT;
+        hashT[charT] = charS;
+    }
+    return true;
+};
+```
+
+结果：
+
+- 39/39 cases passed (96 ms)
+- Your runtime beats 62.93 % of javascript submissions
+- Your memory usage beats 52.65 % of javascript submissions (39.6 MB)
+- 时间复杂度： `O(n)`
+
+#### 查阅他人解法
+
+这里看到了哈希的用法差异衍生出来的不同解法，比如使用单哈希表判断存在，用 `Set/Array/Object` 类型。另外还看到一个不一样的思路，接下来我们来试试。
+
+**Ⅰ.元组**
+
+把两个字符分别去重后，校验长度是否相等，再校验每位字符两两组合后去重，长度是否相等。
+
+代码：
+
+```javascript
+/**
+ * @param {string} s
+ * @param {string} t
+ * @return {boolean}
+ */
+var isIsomorphic = function(s, t) {
+    let i = s.length, arr = new Array(i);
+    while(i--) {
+        arr[i] = s.charAt(i) + ',' + t.charAt(i)
+    }
+    const len = new Set(arr).size
+    return len === new Set(s).size && len === new Set(t).size
+};
+```
+
+结果：
+
+- 39/39 cases passed (100 ms)
+- Your runtime beats 49.48 % of javascript submissions
+- Your memory usage beats 6.24 % of javascript submissions (44.3 MB)
+- 时间复杂度： `O(n)`
+
+#### 思考总结
+
+这道题总体来说还是很简单的，围绕字符出现的位置来作答就可以了。
