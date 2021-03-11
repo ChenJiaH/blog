@@ -58,6 +58,7 @@
 - [203.移除链表元素](#203移除链表元素)
 - [204.计算质数](#204计算质数)
 - [205.同构字符串](#205同构字符串)
+- [206.反转链表](#206反转链表)
 
 ## Easy
 
@@ -8167,3 +8168,131 @@ var isIsomorphic = function(s, t) {
 #### 思考总结
 
 这道题总体来说还是很简单的，围绕字符出现的位置来作答就可以了。
+
+### 206.反转字符串
+
+[题目地址](https://leetcode-cn.com/problems/reverse-linked-list/)
+
+#### 题目描述
+
+反转一个单链表。
+
+示例:
+
+```javascript
+输入: 1->2->3->4->5->NULL
+输出: 5->4->3->2->1->NULL
+```
+
+进阶:
+
+- 你可以迭代或递归地反转链表。你能否用两种方法解决这道题？
+
+#### 题目分析设想
+
+这道题就是玩指针的题，既然进阶要求使用迭代或者递归，那我们就来试试。
+
+#### 编写代码验证
+
+**Ⅰ.迭代**
+
+代码：
+
+```javascript
+/**
+ * @param {ListNode} head
+ * @return {ListNode}
+ */
+var reverseList = function(head) {
+    let prev = null;
+    let cur = head
+    while(cur) {
+        // 先存下后面的链表内容
+        let next = cur.next
+        cur.next = prev
+        prev = cur
+        cur = next
+    }
+    return prev
+};
+```
+
+结果：
+
+- 28/28 cases passed (92 ms)
+- Your runtime beats 49.41 % of javascript submissions
+- Your memory usage beats 79.09 % of javascript submissions (39.5 MB)
+- 时间复杂度： `O(n)`
+
+**Ⅱ.递归**
+
+这个需要画个图才比较清晰，有注释这两行非常关键。
+
+代码：
+
+```javascript
+/**
+ * @param {ListNode} head
+ * @return {ListNode}
+ */
+var reverseList = function(head) {
+    if (head && head.next) {
+        let res = reverseList(head.next)
+        // 下一个节点的next指针指向当前节点
+        head.next.next = head;
+        // 当前节点指针指向null，就会把节点返回
+        head.next = null
+        return res
+    } else { // 递归结束
+        return head
+    }
+};
+```
+
+结果：
+
+- 28/28 cases passed (88 ms)
+- Your runtime beats 67.67 % of javascript submissions
+- Your memory usage beats 13.71 % of javascript submissions (40.2 MB)
+- 时间复杂度： `O(n)`
+
+#### 查阅他人解法
+
+这里有个简单的变种解法，其实跟迭代是一样的，都是利用指针指向局部反转。
+
+**Ⅰ.变种指针**
+
+代码：
+
+```javascript
+/**
+ * @param {ListNode} head
+ * @return {ListNode}
+ */
+var reverseList = function(head) {
+    if (!head) return null;
+    let cur = head;
+    while (head.next) {
+        // 存在下个结点的next内容
+        let tmp = head.next.next
+        // 局部倒转
+        head.next.next = cur;
+        // 指向开始的项
+        cur = head.next;
+        // 后移
+        head.next = tmp;
+    }
+    return cur;
+};
+```
+
+结果：
+
+- 28/28 cases passed (80 ms)
+- Your runtime beats 93.31 % of javascript submissions
+- Your memory usage beats 52.15 % of javascript submissions (39.7 MB)
+- 时间复杂度： `O(n)`
+
+#### 思考总结
+
+指针的题，建议先画图，主要就是修改指针引用，这块画出来，解题就清晰了。
