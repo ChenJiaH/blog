@@ -34,6 +34,9 @@
           <router-view class="page"/>
         </transition>
       </div>
+      <div class="footer flex flex-middle flex-center">
+        <a href="javascript:;">京ICP备19008130号-2</a>
+      </div>
     </div>
 
     <template v-if="global.mode === 'mobile'">
@@ -439,6 +442,8 @@ export default {
       }
     }
   }
+
+  .footer { position: fixed; left: 0; right: 0; bottom: 0; height: 40px; font-size: 12px; color: $mainWeak; background-color: #fff; box-shadow: 0 -1px 4px 0 rgba(0,0,0,0.04);}
 
   .toolbox {
     position: fixed;
