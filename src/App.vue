@@ -35,7 +35,7 @@
         </transition>
       </div>
       <div class="footer flex flex-middle flex-center">
-        <a href="javascript:;">京ICP备19008130号-2</a>
+        <a target="_blank" rel="noopener noreferrer" href="https://beian.miit.gov.cn/">京ICP备19008130号-2</a>
       </div>
     </div>
 
